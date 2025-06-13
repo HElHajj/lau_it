@@ -1,0 +1,2619 @@
+/* =================================== */
+/* === Reset & Base Styles === */
+/* =================================== */
+
+/* Apply box-sizing border-box to all elements for easier layout calculations */
+* {
+  box-sizing: border-box; /* Include padding and border in the element's total width and height */
+  margin: 0; /* Remove default margins */
+  padding: 0; /* Remove default padding */
+}
+
+/* Set base styles for HTML and Body */
+html, body {
+  height: 100%; /* Ensure html and body take full viewport height */
+  width: 100%; /* Ensure html and body take full viewport width */
+  overflow-x: hidden; /* Prevent horizontal scrolling */
+  font-family: Arial, sans-serif; /* Set default font */
+  background-color: #f4f4f4; /* Set default background color */
+  color: #333; /* Set default text color */
+  line-height: 1.4; /* Set default line height for readability */
+}
+
+/* =================================== */
+/* === Splash Screen Styles (NEW) === */
+/* =================================== */
+
+/* The main container for the splash screen */
+#splashScreen {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    /* AMENDED: Using a diagonal linear-gradient for a stylish split-screen effect */
+    background: #016751;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 9999; /* Ensures it's on top of all other content */
+    transition: opacity 0.5s ease-out; /* Smooth fade-out transition */
+}
+
+/* The logo image on the splash screen */
+#splashLogo {
+    width: 280px; /* Adjust size as needed for a prominent logo */
+    height: auto;
+    /* Apply the wave animation */
+    animation: wave-in 1.5s ease-in-out forwards;
+}
+
+/* Keyframes for the "wave-in" animation */
+@keyframes wave-in {
+    0% {
+        transform: scale(0.3); /* Start smaller */
+        opacity: 0; /* Start invisible */
+    }
+    60% {
+        transform: scale(1.3); /* Overshoot to create a bounce/wave effect */
+        opacity: 1;
+    }
+    100% {
+        transform: scale(1); /* Settle at normal size */
+        opacity: 1; /* End fully visible */
+    }
+}
+
+/* A helper class added by JavaScript to hide the splash screen */
+#splashScreen.hidden {
+    opacity: 0;
+    pointer-events: none; /* Disables mouse events during fade-out */
+}
+
+/* =================================== */
+/* === Layout Structure === */
+/* =================================== */
+
+/* Body layout using Flexbox */
+body {
+  display: flex; /* Enable flexbox layout */
+  flex-direction: column; /* Stack children vertically */
+  min-height: 100vh; /* Ensure body takes at least the full viewport height */
+  align-items: center; /* Center content horizontally */
+  /*visibility: hidden; /* Hide the body initially for fade-in effect */
+  opacity: 0; /* Make it fully transparent initially */
+  transition: opacity 0.3s ease-in; /* Smooth fade-in transition */
+}
+
+/* Campus container for buildings */
+.campus-container {
+  display: flex; /* Use flexbox for layout */
+  flex-wrap: wrap; /* Allow items to wrap to the next line */
+  justify-content: center; /* Center buildings horizontally */
+  gap: 15px; /* Space between buildings */
+  padding: 15px; /* Padding around the container */
+  width: 100%; /* Take full available width */
+  max-width: 2500px; /* Limit maximum width */
+}
+
+/* =================================== */
+/* === Auth Modal Specific Styles === */
+/* =================================== */
+
+/* This rule targets the auth modal's content area and centers its children (h2, input, button) horizontally. */
+#authModal .modal-content {
+  align-items: center;
+}
+
+/* This rule centers the text and placeholder text inside the input field itself. */
+#authModal #authCode {
+  text-align: center;
+}
+
+/* =================================== */
+/* === Header Styles === */
+/* =================================== */
+
+/* Header container */
+header {
+      position: relative; /* Establishes a positioning context for the h1 */
+      display: flex; /* Arranges child elements (logo, h1, controls) in a row */
+      align-items: center; /* Vertically aligns items in the header */
+      /* padding: 10px 20px; /* Adjust as needed, or ensure it's in your style.css */
+      /* width: 100%; /* Header usually spans full width by default */
+      /* box-sizing: border-box; /* Good practice if not globally set */
+  }
+
+  header h1 {
+      position: absolute; /* Takes h1 out of the normal document flow */
+      left: 50%; /* Positions the left edge of h1 at the horizontal center of the header */
+      top: 50%; /* Positions the top edge of h1 at the vertical center of the header */
+      transform: translate(-50%, -50%); /* Shifts h1 back by half of its own width and height, centering it precisely */
+      margin: 0; /* Removes any default browser margins from the h1 */
+      white-space: nowrap; /* Prevents the title from wrapping to a new line */
+      /* z-index: 0; /* By default, h1 will be behind other z-indexed items if overlap occurs. */
+  }
+
+  /* Ensure the .header-controls div is pushed to the far right */
+  header .header-controls {
+      margin-left: auto; /* This is key for pushing subsequent items to the right in a flex container */
+      z-index: 1; /* Ensures controls are above the h1 if they were to overlap */
+      flex-shrink: 0; /* Prevents the controls container from shrinking if the header is crowded */
+  }
+
+  /* Ensure back-button and logo stay on the left and are visually above h1 if overlap occurs */
+  header .back-button,
+  header .logo {
+      z-index: 1; /* Ensures these elements are above the h1 if they were to overlap */
+      flex-shrink: 0; /* Prevents these elements from shrinking */
+  }
+
+header {
+  background-color: #016751; /* Header background color (theme green) */
+  color: white; /* Header text color */
+  padding: 10px 20px; /* Adjusted padding for better spacing with back button */
+  width: 100%; /* Full width */
+  box-shadow: 0 2px 5px rgba(0,0,0,0.1); /* Subtle bottom shadow */
+  display: flex; /* Use flexbox for layout */
+  justify-content: space-between; /* Space out logo, title, buttons */
+  align-items: center; /* Align items vertically */
+}
+
+/* Back button style - UPDATED for no background */
+.back-button {
+  display: flex; /* For centering the arrow */
+  align-items: center;
+  justify-content: center;
+  width: 44px; /* Increased size for better touch target with transparent bg */
+  height: 44px; /* Increased size */
+  background-color: transparent; /* REMOVED background color */
+  border-radius: 50%; /* Makes it circular */
+  text-decoration: none; /* Remove underline from link */
+  cursor: pointer;
+  transition: transform 0.2s ease, opacity 0.2s ease; /* Smooth transitions */
+  margin-right: 10px; /* Adjusted margin */
+  padding: 4px; /* Add some padding so the hover effect has some space */
+  border: 2px solid transparent; /* Transparent border initially */
+}
+
+.back-button .back-arrow-icon {
+  width: 24px; /* SVG icon width */
+  height: 24px; /* SVG icon height */
+  fill: white; /* SVG icon color */
+  transition: fill 0.2s ease, transform 0.2s ease;
+}
+
+.back-button:hover .back-arrow-icon {
+  fill: #e0e0e0; /* Slightly lighter white on hover for icon */
+  transform: scale(1.1); /* Slightly enlarge icon on hover */
+}
+.back-button:hover {
+  background-color: rgba(255, 255, 255, 0.1); /* Subtle background on hover */
+}
+
+
+.back-button:active .back-arrow-icon {
+  fill: #bdbdbd; /* Dimmer white on active for icon */
+  transform: scale(0.95); /* Slightly shrink icon on active */
+}
+.back-button:active {
+  background-color: rgba(255, 255, 255, 0.15); /* Slightly more visible background on active */
+  transform: scale(0.98);
+}
+
+
+/* Logo image */
+.logo {
+  height: 60px; /* Set logo height */
+  /* margin-right: 20px; /* Space to the right of the logo - adjusted by back button margin */
+}
+
+/* Main title */
+h1 {
+  font-size: 2rem; /* Title font size */
+  margin: 0; /* Remove default margin */
+  text-align: center; /* Center the title text */
+  flex-grow: 1; /* Allow title to take available space */
+  /* Add some margin to prevent overlap if back button is very wide, though flex should handle it */
+  margin-left: 15px;
+  margin-right: 15px;
+}
+
+/* Wrapper for right-side header controls */
+.header-controls {
+    display: flex;
+    align-items: center;
+    gap: 15px; /* Space between mute and export buttons */
+}
+
+/* Mute button */
+.mute-button {
+  background: none; /* No background */
+  border: none; /* No border */
+  color: white; /* Icon/text color */
+  font-size: 1.5rem; /* Icon/text size */
+  cursor: pointer; /* Pointer cursor on hover */
+  padding: 5px; /* Padding around the button */
+  transition: transform 0.1s ease, color 0.2s ease;
+}
+.mute-button:hover {
+    transform: scale(1.1);
+    color: #f0f0f0;
+}
+.mute-button:active {
+    transform: scale(0.95);
+}
+
+
+/* Export Activity Log Button */
+#exportLogButton {
+  background-color: #f8f9fa; /* Light background */
+  color: #016751; /* Theme green text color */
+  border: 1px solid #dee2e6; /* Subtle border */
+  padding: 6px 12px; /* Padding */
+  border-radius: 6px; /* Rounded corners */
+  cursor: pointer; /* Pointer cursor */
+  font-size: 0.85rem; /* Font size */
+  font-weight: 500; /* Medium font weight */
+  /* margin-left: 15px; /* Space to the left - handled by header-controls gap */
+  transition: background-color 0.2s ease, border-color 0.2s ease, transform 0.1s ease, box-shadow 0.2s ease; /* Smooth transitions */
+  white-space: nowrap; /* Prevent text wrapping */
+  box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+}
+
+/* Hover state for Export button */
+#exportLogButton:hover {
+  background-color: #e9ecef; /* Slightly darker background */
+  border-color: #ced4da; /* Slightly darker border */
+  transform: translateY(-1px); /* Slight lift effect */
+  box-shadow: 0 2px 4px rgba(0,0,0,0.08);
+}
+
+/* Active (pressed) state for Export button */
+#exportLogButton:active {
+  transform: translateY(0px); /* Reset lift effect */
+  background-color: #dee2e6; /* Darker background */
+  box-shadow: inset 0 1px 1px rgba(0,0,0,0.1);
+}
+
+/* Disabled state for Export button */
+#exportLogButton:disabled {
+  background-color: #e9ecef; /* Similar background to hover */
+  color: #adb5bd; /* Greyed out text */
+  cursor: not-allowed; /* Not-allowed cursor */
+  transform: none; /* No hover/active effects */
+  border-color: #e0e0e0; /* Lighter border */
+  box-shadow: none;
+}
+
+/* =================================== */
+/* === Building & Level Styles === */
+/* =================================== */
+
+/* Individual building container */
+.building-container {
+  background: white; /* White background */
+  border-radius: 10px; /* Rounded corners */
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1); /* Subtle shadow */
+  padding: 15px; /* Padding inside the container */
+  width: 100%; /* Responsive width */
+  max-width: 270px; /* Maximum width */
+  min-width: 220px; /* Minimum width */
+  display: flex; /* Use flexbox */
+  flex-direction: column; /* Stack content vertically */
+  align-items: center; /* Center content horizontally */
+  margin-bottom: 15px; /* Space below each building */
+}
+
+/* Building name title */
+.building-container h2 {
+  color: #016751; /* Theme green color */
+  font-size: 1.3rem; /* Font size */
+  margin-bottom: 10px; /* Space below title */
+  padding-bottom: 5px; /* Padding below text */
+  border-bottom: 1px solid #eee; /* Bottom border */
+  width: 100%; /* Full width */
+  text-align: center; /* Center text */
+}
+
+/* Container for levels within a building */
+.level-container {
+  background: #e0e0e0; /* Light grey background */
+  border-radius: 8px; /* Rounded corners */
+  padding: 10px; /* Padding inside */
+  margin-bottom: 10px; /* Space below each level */
+  width: 100%; /* Full width */
+  display: flex; /* Use flexbox */
+  flex-direction: column; /* Stack content vertically */
+  align-items: center; /* Center content horizontally */
+}
+
+/* Level title (e.g., "Level 1") */
+.level-title {
+  font-weight: bold; /* Bold text */
+  font-size: 0.9rem; /* Font size */
+  margin-bottom: 8px; /* Space below title */
+  width: 100%; /* Full width */
+  text-align: center; /* Center text */
+  color: #555; /* Dark grey color */
+}
+
+/* =================================== */
+/* === Classroom Styles === */
+/* =================================== */
+
+/* Grid container for classrooms within a level */
+.classroom-grid {
+  display: flex; /* Use flexbox */
+  flex-wrap: wrap; /* Allow wrapping */
+  justify-content: center; /* Center classrooms horizontally */
+  gap: 8px; /* Space between classrooms */
+  width: 100%; /* Full width */
+}
+
+/* Individual classroom button */
+.classroom {
+  background: #016751; /* Theme green background */
+  color: white; /* White text */
+  padding: 8px 5px; /* Padding */
+  border-radius: 8px; /* Rounded corners */
+  font-size: 0.9rem; /* Font size */
+  width: 50px; /* Fixed width */
+  height: 45px; /* Fixed height */
+  line-height: 25px; /* Approximate vertical centering for single line */
+  cursor: pointer; /* Pointer cursor */
+  transition: all 0.2s ease; /* Smooth transitions for hover effects */
+  text-align: center; /* Center text horizontally */
+  flex: 0 0 auto; /* Prevent stretching in flex container */
+  box-shadow: 0 1px 3px rgba(0,0,0,0.1); /* Subtle shadow */
+  font-weight: bold; /* Bold text (room number) */
+  display: flex; /* Use flexbox for centering content */
+  justify-content: center; /* Center content horizontally */
+  align-items: center; /* Center content vertically */
+}
+
+/* Hover state for classroom button */
+.classroom:hover {
+  background: #01a87a; /* Brighter green background */
+  transform: translateY(-2px); /* Slight lift effect */
+  box-shadow: 0 3px 6px rgba(0,0,0,0.15); /* Stronger shadow */
+}
+
+/* Original state color (used for resetting) */
+.original {
+  background-color: #016751; /* Theme green */
+}
+
+/* Blinking red animation for reported issues */
+@keyframes blinkRed {
+  0%, 100% { background-color: red; } /* Start/end color */
+  50% { background-color: darkred; } /* Mid-animation color */
+}
+
+/* Apply blinking red animation */
+.blink-red {
+  animation: blinkRed 1.2s infinite; /* Apply animation, duration, infinite loop */
+  color: white; /* Ensure text is white */
+}
+
+/* Blinking yellow animation for handled issues */
+@keyframes blinkYellow {
+  0%, 100% { background-color: yellow; } /* Start/end color */
+  50% { background-color: yellowgreen; } /* Mid-animation color */
+}
+
+/* Apply blinking yellow animation */
+.blink-yellow {
+  animation: blinkYellow 1.2s infinite; /* Apply animation, duration, infinite loop */
+  color: white; /* Ensure text is white (might need adjustment for yellow bg) */
+}
+
+/* =================================== */
+/* === Modal Styles (General) === */
+/* =================================== */
+
+/* Modal backdrop */
+.modal {
+  position: fixed; /* Position relative to the viewport */
+  top: 0;
+  left: 0;
+  width: 100%; /* Full width */
+  height: 100%; /* Full height */
+  background: rgba(0, 0, 0, 0.6); /* Semi-transparent black backdrop */
+  display: flex; /* Use flexbox for centering */
+  justify-content: center; /* Center horizontally */
+  align-items: center; /* Center vertically */
+  z-index: 1000; /* Ensure modal is on top */
+  padding: 15px; /* Padding for smaller screens */
+}
+
+/* Modal content container */
+.modal-content {
+  background: white; /* White background */
+  border-radius: 10px; /* Rounded corners */
+  padding: 25px; /* Padding inside */
+  padding-top: 50px; /* Extra top padding for close button */
+  width: 95%; /* Responsive width */
+  max-width: 450px; /* Maximum width */
+  box-shadow: 0 5px 15px rgba(0,0,0,0.2); /* Shadow for depth */
+  display: flex; /* Use flexbox */
+  flex-direction: column; /* Stack content vertically */
+  align-items: stretch; /* Stretch items to fill width */
+  position: relative; /* Needed for absolute positioning of close button */
+  max-height: 90vh; /* Limit maximum height */
+  overflow-y: auto; /* Allow vertical scrolling if content overflows */
+}
+
+/* Modal title */
+.modal h2 {
+  margin-top: 20px;
+  margin-bottom: 20px; /* Space below title */
+  color: #016751; /* Theme green color */
+  text-align: center; /* Center text */
+  width: 100%; /* Full width */
+  font-size: 1.4rem; /* Font size */
+}
+
+/* Paragraphs within modal */
+.modal-content p {
+  padding-bottom: 10px; /* Space below paragraphs */
+}
+
+/* Labels within modal */
+.modal label {
+  display: block; /* Make labels block-level */
+  margin-bottom: 5px; /* Space below labels */
+  font-weight: bold; /* Bold text */
+  color: #555; /* Dark grey color */
+  text-align: left; /* Align text left */
+  width: 100%; /* Full width */
+}
+
+/* Input fields, textarea, select dropdowns within modal */
+.modal input[type="text"],
+.modal input[type="password"],
+.modal input[type="date"],
+.modal textarea,
+.modal select {
+  width: 100%; /* Full width */
+  padding: 12px; /* Padding inside */
+  margin-bottom: 15px; /* Space below */
+  border: 1px solid #ccc; /* Grey border */
+  border-radius: 6px; /* Rounded corners */
+  font-size: 1rem; /* Font size */
+}
+
+/* Specific style for date input text color */
+.modal input[type="date"] {
+  color: #333; /* Default text color, override browser default if needed */
+}
+
+/* Placeholder text styling for date input (cross-browser) */
+.modal input[type="date"]::placeholder { /* Standard */
+    color: #6c757d; /* Muted grey placeholder */
+    opacity: 1; /* Ensure visibility */
+}
+.modal input[type="date"]::-webkit-input-placeholder { /* Webkit (Chrome, Safari) */
+    color: #6c757d;
+}
+.modal input[type="date"]::-moz-placeholder { /* Firefox */
+    color: #6c757d;
+    opacity: 1;
+}
+.modal input[type="date"]:-ms-input-placeholder { /* IE */
+    color: #6c757d;
+}
+.modal input[type="date"]::-ms-input-placeholder { /* Edge */
+    color: #6c757d;
+}
+
+/* Attempt to style the date picker calendar icon (Webkit) */
+.modal input[type="date"]::-webkit-calendar-picker-indicator {
+  cursor: pointer; /* Pointer cursor */
+  opacity: 1; /* Ensure visibility */
+  /* Use filter to approximate theme green color */
+  filter: invert(25%) sepia(50%) saturate(300%) hue-rotate(130deg) brightness(90%) contrast(100%);
+}
+
+/* Hover effect for the calendar icon (Webkit) */
+.modal input[type="date"]::-webkit-calendar-picker-indicator:hover {
+  opacity: 0.7; /* Slight fade on hover */
+}
+
+/* Focus state for modal inputs, textarea, select */
+.modal input:focus,
+.modal input[type="date"]:focus,
+.modal textarea:focus,
+.modal select:focus {
+    outline: none; /* Remove default outline */
+    border-color: #016751; /* Theme green border color */
+    box-shadow: 0 0 0 2px rgba(1, 103, 81, 0.2); /* Theme green focus ring */
+}
+
+/* Container for modal action buttons */
+.modal-actions {
+  display: flex; /* Use flexbox */
+  justify-content: center; /* Center buttons horizontally */
+  gap: 10px; /* Space between buttons */
+  width: 100%; /* Full width */
+  margin-top: 20px; /* Space above buttons */
+}
+
+/* General modal button style */
+.modal button {
+  background-color: #016751; /* Theme green background */
+  color: white; /* White text */
+  border: none; /* No border */
+  padding: 12px 25px; /* Padding */
+  border-radius: 6px; /* Rounded corners */
+  cursor: pointer; /* Pointer cursor */
+  transition: background-color 0.2s ease, transform 0.1s ease; /* Smooth transitions */
+  font-size: 1rem; /* Font size */
+  font-weight: bold; /* Bold text */
+  width: auto; /* Allow width to adjust to content */
+  min-width: 100px; /* Minimum width */
+}
+
+/* Hover state for modal buttons */
+.modal button:hover {
+  background-color: #01a87a; /* Brighter green background */
+  transform: scale(1.02); /* Slight scale effect */
+}
+
+/* Active (pressed) state for modal buttons */
+.modal button:active {
+    transform: scale(0.98); /* Slight shrink effect */
+}
+
+/* Disabled state for modal buttons */
+.modal button:disabled {
+  background-color: #bdbdbd; /* Grey background */
+  cursor: not-allowed; /* Not-allowed cursor */
+  transform: none; /* No hover/active effects */
+  color: #757575; /* Darker grey text */
+}
+
+/* Close button container (positioned absolutely) */
+.close-button {
+  position: absolute; /* Position relative to modal-content */
+  top: 10px; /* Distance from top */
+  right: 10px; /* Distance from right */
+  width: 30px; /* Fixed width */
+  height: 30px; /* Fixed height */
+  display: flex; /* Use flexbox for centering */
+  align-items: center; /* Center vertically */
+  justify-content: center; /* Center horizontally */
+  background-color: transparent; /* No background */
+  border-radius: 50%; /* Circular shape */
+  padding: 0; /* No padding */
+  z-index: 1001; /* Ensure it's above other content */
+}
+
+/* The 'X' character for the close button */
+.close-x {
+  cursor: pointer; /* Pointer cursor */
+  font-size: 24px; /* Size of the 'X' */
+  font-weight: bold; /* Bold 'X' */
+  color: #9e9e9e; /* Light grey color */
+  line-height: 1; /* Ensure proper vertical alignment */
+  transition: color 0.2s ease, transform 0.2s ease; /* Smooth transitions */
+}
+
+/* Hover state for the 'X' */
+.close-x:hover {
+  color: #e53935; /* Red color on hover */
+  transform: rotate(90deg); /* Rotate effect */
+}
+
+/* Active (pressed) state for the 'X' */
+.close-x:active {
+  color: #c62828; /* Darker red */
+}
+
+/* =================================== */
+/* === Generic Modal Specific Styles === */
+/* =================================== */
+
+#genericAlertModalMessage,
+#genericConfirmModalMessage {
+    text-align: center;
+    margin-top: 15px;
+    margin-bottom: 20px;
+    white-space: pre-wrap; /* Respect newlines in messages */
+    line-height: 1.5;   /* Improved readability */
+    font-size: 1rem;    /* Standard message text size */
+    color: #333;       /* Standard text color */
+}
+
+/* #genericAlertModalOkButton inherits from .modal button */
+/* #genericConfirmModalYesButton inherits from .modal button */
+
+#genericConfirmModalNoButton {
+    background-color: #6c757d; /* Grey for 'No' or 'Cancel' */
+    color: white;
+}
+
+#genericConfirmModalNoButton:hover {
+    background-color: #5a6268; /* Darker grey on hover */
+}
+
+
+/* =================================== */
+/* === Issue Reporting Modal Styles === */
+/* =================================== */
+
+/* Container for issue type buttons */
+.issue-buttons {
+  display: flex; /* Use flexbox */
+  flex-wrap: wrap; /* Allow wrapping */
+  justify-content: center; /* Center buttons */
+  gap: 10px; /* Space between buttons */
+  margin: 15px 0; /* Vertical margin */
+  width: 100%; /* Full width */
+}
+
+/* Individual issue type button */
+.issue-buttons button.issue-btn {
+  padding: 10px 15px; /* Padding */
+  font-size: 0.9rem; /* Font size */
+  flex-grow: 1; /* Allow buttons to grow */
+  flex-basis: calc(33.333% - 10px); /* Aim for 3 buttons per row */
+  max-width: 120px; /* Maximum width */
+  min-width: 80px; /* Minimum width */
+  text-align: center; /* Center text */
+  background-color: #e0e0e0; /* Default grey background */
+  color: #333; /* Default text color */
+  border: 1px solid #ccc; /* Grey border */
+  border-radius: 6px; /* Rounded corners */
+  cursor: pointer; /* Pointer cursor */
+  transition: background-color 0.2s, color 0.2s, border-color 0.2s; /* Smooth transitions */
+}
+
+/* Hover state for issue type button */
+.issue-buttons button.issue-btn:hover {
+  background-color: #d5d5d5; /* Darker grey background */
+  border-color: #bbb; /* Darker grey border */
+}
+
+/* Active (selected) state for issue type button */
+.issue-buttons button.issue-btn.active {
+  background-color: #ff9800; /* Orange background */
+  color: white; /* White text */
+  border-color: #f57c00; /* Darker orange border */
+  font-weight: bold; /* Bold text */
+}
+
+/* Textarea for issue details */
+#issueDetails {
+  min-height: 100px; /* Minimum height */
+  resize: vertical; /* Allow only vertical resizing */
+  width: 100%; /* Full width (inherits from .modal textarea) */
+}
+
+/* Success message display (used in Issue and Handle modals) */
+#successMessage,
+#handleIssueSuccessMessage {
+  font-weight: bold; /* Bold text */
+  color: #2e7d32; /* Dark green color */
+  text-align: center; /* Center text */
+  width: 100%; /* Full width */
+  font-size: 1.3rem; /* Font size */
+  padding: 20px; /* Padding */
+  display: flex; /* Use flexbox (used when shown via JS) */
+  flex-direction: column; /* Stack content vertically */
+  justify-content: center; /* Center vertically */
+  align-items: center; /* Center horizontally */
+  min-height: 80px; /* Minimum height */
+  padding-bottom: 10px; /* Bottom padding */
+  /* Initially hidden by JS */
+}
+
+/* Specific margin for issue modal success message */
+#successMessage {
+  margin-bottom: 20px; /* Space below message */
+}
+
+/* Hide close button when issue modal success message is visible */
+#issueModal #successMessage:not([style*="display: none"]) ~ .close-button {
+  display: none; /* Hide the button */
+}
+
+.modal-content.center-content {
+    justify-content: center; /* Vertically center content */
+    align-items: center;     /* Horizontally center content */
+    padding: 25px;           /* Use consistent padding */
+    min-height: 150px;       /* Give the box a decent size */
+}
+
+/* Adjust title margins when centered */
+.modal-content.center-content h2 {
+    margin: 0; /* Remove default top/bottom margin */
+}
+
+/* =================================== */
+/* === Handle Issue Modal Styles === */
+/* =================================== */
+
+/* Form within the handle issue modal */
+#handleIssueForm {
+  text-align: center; /* Center form content */
+  width: 100%; /* Full width */
+}
+
+/* Labels within the handle issue form */
+#handleIssueForm label {
+    margin-bottom: 8px; /* Space below label */
+}
+
+/* Staff selection dropdown */
+.staff-select {
+  width: 100%; /* Full width */
+  padding: 12px; /* Padding */
+  margin-bottom: 15px; /* Space below */
+  border: 1px solid #ccc; /* Grey border */
+  border-radius: 6px; /* Rounded corners */
+  background-color: white; /* White background */
+  font-size: 1rem; /* Font size */
+  cursor: pointer; /* Pointer cursor */
+  appearance: none; /* Remove default browser appearance */
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  /* Custom dropdown arrow using SVG */
+  background-image: url('data:image/svg+xml;charset=US-ASCII,<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="%23555" viewBox="0 0 16 16"><path fill-rule="evenodd" d="M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z"/></svg>');
+  background-repeat: no-repeat; /* Don't repeat arrow */
+  background-position: right 12px center; /* Position arrow */
+  background-size: 16px 12px; /* Arrow size */
+}
+
+/* Hover state for staff select */
+.staff-select:hover {
+  border-color: #aaa; /* Darker border */
+}
+
+/* Focus state for staff select */
+.staff-select:focus {
+  border-color: #016751; /* Theme green border */
+  box-shadow: 0 0 0 2px rgba(1, 103, 81, 0.2); /* Theme green focus ring */
+  outline: none; /* Remove default outline */
+}
+
+/* Options within the dropdown */
+.staff-select option {
+  padding: 10px; /* Padding */
+  font-size: 1rem; /* Font size */
+}
+
+/* Style for the placeholder option */
+.staff-select option[value=""] {
+  color: #999; /* Grey color for placeholder */
+}
+
+/* Submit button for handling issue */
+#submitHandledIssue {
+  /* Inherits general modal button style */
+  margin-top: 15px; /* Space above button */
+}
+
+/* Hide close button when handle issue success message is visible */
+#handleIssueModal #handleIssueSuccessMessage:not([style*="display: none"]) ~ .close-button {
+  display: none; /* Hide the button */
+}
+
+/* =================================== */
+/* === Cancel Confirmation Modal Styles === */
+/* =================================== */
+
+/* Buttons specific to the cancel confirmation modal */
+#cancelConfirmModal .modal-content button {
+  min-width: 80px; /* Minimum width */
+}
+
+/* Style the "Yes, Cancel" button (first button) */
+#cancelConfirmModal .modal-content button:first-of-type {
+  background-color: #e53935 !important; /* Red background (use !important carefully) */
+}
+#cancelConfirmModal .modal-content button:first-of-type:hover {
+  background-color: #c62828 !important; /* Darker red background */
+}
+
+/* Style the "No" button (last button) */
+#cancelConfirmModal .modal-content button:last-of-type {
+  background-color: #757575 !important; /* Grey background */
+}
+#cancelConfirmModal .modal-content button:last-of-type:hover {
+  background-color: #616161 !important; /* Darker grey background */
+}
+
+/* =================================== */
+/* === Export Log Modal Styles === */
+/* =================================== */
+
+/* Status message within the export log modal */
+#exportStatusMessage {
+  font-weight: 500; /* Medium weight */
+  text-align: center; /* Center text */
+  width: 100%; /* Full width */
+  font-size: 0.9rem; /* Font size */
+  padding: 10px 5px; /* Padding */
+  margin-top: 10px; /* Space above */
+  min-height: 20px; /* Minimum height */
+  /* Color is set dynamically via JS */
+}
+
+/* Spacing for filter sections */
+#exportLogModal .modal-content > div[style*="margin-top: 10px"] {
+  margin-bottom: 15px; /* Space below filter groups */
+}
+
+/* Main labels for filter groups */
+#exportLogModal .modal-content > div > label:first-child {
+  display: block; /* Block display */
+  margin-bottom: 8px; /* Space below label */
+  font-weight: bold; /* Bold text */
+  color: #333; /* Dark text color */
+  font-size: 0.95rem; /* Font size */
+}
+
+/* Container for checkbox lists (buildings, classrooms) */
+#exportBuildingCheckboxes,
+#exportClassroomCheckboxes {
+  background-color: #f9f9f9; /* Light background */
+  border: 1px solid #dcdcdc; /* Light border */
+  border-radius: 4px; /* Rounded corners */
+  padding: 8px 10px; /* Padding */
+  max-height: 150px; /* Limit height */
+  overflow-y: auto; /* Allow scrolling */
+  margin-top: 5px; /* Space above */
+}
+
+/* Container for radio button group */
+#exportClassroomModeSelection {
+  border: 1px solid #dcdcdc; /* Light border */
+  background-color: #f9f9f9; /* Light background */
+  border-radius: 4px; /* Rounded corners */
+  padding: 8px 10px; /* Padding */
+  margin-top: 5px; /* Space above */
+}
+
+/* Individual checkbox/radio item wrapper */
+#exportBuildingCheckboxes div,
+#exportClassroomModeSelection div,
+#exportClassroomCheckboxes div {
+  padding: 4px 0; /* Vertical spacing */
+  display: flex; /* Use flexbox for alignment */
+  align-items: center; /* Align input and label vertically */
+}
+
+/* Labels for checkboxes/radios */
+#exportBuildingCheckboxes label,
+#exportClassroomModeSelection label,
+#exportClassroomCheckboxes label {
+  margin-left: 8px; /* Space between input and label */
+  cursor: pointer; /* Pointer cursor */
+  font-size: 0.9rem; /* Font size */
+  color: #444; /* Text color */
+}
+
+/* Style for "All" checkbox labels */
+#exportBuildingCheckboxes label[for="export_building_all"],
+#exportClassroomCheckboxes label[for="export_room_all_subset"] {
+  font-weight: bold; /* Bold text */
+  color: #111; /* Darker color */
+}
+
+/* Container for specific classroom selection (shown conditionally) */
+#exportSpecificClassroomSelection {
+  /* display: none/block handled by JS */
+  border-top: 1px dashed #ccc; /* Dashed top border separator */
+  padding-top: 15px; /* Space above */
+  margin-top: 15px; /* Space below radio buttons */
+}
+
+/* Label for specific classroom selection */
+#exportSpecificClassroomSelection > label:first-child {
+  font-style: italic; /* Italic text */
+  margin-bottom: 8px; /* Space below */
+  font-weight: bold; /* Bold text */
+}
+
+/* Checkbox and radio button elements */
+#exportLogModal input[type="checkbox"],
+#exportLogModal input[type="radio"] {
+  margin: 0; /* Remove default margin */
+  vertical-align: middle; /* Align with text */
+  width: 15px; /* Custom size */
+  height: 15px; /* Custom size */
+  cursor: pointer; /* Pointer cursor */
+}
+
+/* Text/date inputs within export modal */
+#exportLogModal #exportHandledByInput,
+#exportLogModal #exportStartDate,
+#exportLogModal #exportEndDate {
+  /* Inherits general modal input styles */
+  padding: 10px; /* Adjust padding if needed */
+}
+
+/* Hover effect for checkbox/radio rows */
+#exportBuildingCheckboxes div:hover,
+#exportClassroomModeSelection div:hover,
+#exportClassroomCheckboxes div:hover {
+    background-color: #f0f0f0; /* Light grey background on hover */
+}
+
+/* Submit button for export log */
+#submitExportLog {
+  margin-top: 25px; /* Extra space above button */
+}
+
+/* =================================== */
+/* === Issue Message Display Cards === */
+/* =================================== */
+
+/* Container for issue messages below a level */
+.level-issues-container {
+  width: 100%; /* Full width */
+  margin-top: 15px; /* Space above issue cards */
+  padding: 0 5px; /* Horizontal padding */
+  min-height: 20px;
+}
+
+/* Individual issue message card */
+.issue-message {
+  background: #fff3e0; /* Light orange background */
+  border-left: 5px solid #ff9800; /* Orange left border accent */
+  padding: 12px 15px; /* Padding */
+  margin-bottom: 10px; /* Space below card */
+  border-radius: 0 6px 6px 0; /* Rounded corners (right side) */
+  font-size: 0.85rem; /* Base font size */
+  text-align: left; /* Align text left */
+  box-shadow: 0 1px 3px rgba(0,0,0,0.08); /* Subtle shadow */
+}
+
+/* Header within the issue card (e.g., "Issue Reported") */
+.issue-header {
+  font-weight: bold; /* Bold text */
+  color: #e65100; /* Dark orange color */
+  font-size: 0.95rem; /* Font size */
+  margin-bottom: 5px; /* Space below */
+}
+
+/* Meta information (user/IP) container */
+.issue-meta {
+    font-size: 0.75rem; /* Smaller font size */
+    color: #757575; /* Grey color */
+    margin-bottom: 5px; /* Space below */
+    font-style: italic; /* Italic text */
+}
+
+/* Issue type display */
+.issue-type {
+  margin: 4px 0; /* Vertical margin */
+  color: #333; /* Text color */
+  font-weight: 500; /* Medium weight */
+}
+/* Add "Issue: " prefix */
+.issue-type::before {
+    content: "Issue: "; /* Text prefix */
+    font-weight: normal; /* Normal weight for prefix */
+    color: #555; /* Dark grey color */
+}
+
+/* Issue description display */
+.issue-description {
+  color: #424242; /* Dark grey text */
+  margin: 4px 0; /* Vertical margin */
+  line-height: 1.3; /* Line height for readability */
+}
+/* Add "Desc: " prefix */
+.issue-description::before {
+    content: "Desc: "; /* Text prefix */
+    font-weight: normal; /* Normal weight */
+    color: #555; /* Dark grey color */
+}
+
+/* Timestamp display */
+.issue-time {
+  font-size: 0.75rem; /* Smaller font size */
+  color: #757575; /* Grey color */
+  margin-top: 5px; /* Space above */
+  font-style: italic; /* Italic text */
+}
+
+/* "Handled by" display */
+.handled-by {
+  font-size: 0.75rem; /* Smaller font size */
+  margin-top: 5px; /* Space above */
+  /* Color is set specifically below */
+}
+
+/* Specific style for "Handled by" text within an issue message */
+.issue-message .handled-by {
+  color: #016751; /* Theme green color */
+  font-weight: 500; /* Medium weight */
+}
+
+/* Container for buttons within the issue card */
+.issue-card-actions {
+  display: flex; /* Use flexbox */
+  justify-content: flex-end; /* Align buttons to the right */
+  gap: 8px; /* Space between buttons */
+  margin-top: 10px; /* Space above buttons */
+  width: 100%; /* Full width */
+}
+
+/* Cancel Issue button */
+.cancel-issue-btn {
+  background-color: #ffb74d; /* Light orange background */
+  color: #424242; /* Dark text */
+  border: 1px solid #ffa726; /* Orange border */
+  padding: 6px 12px; /* Padding */
+  border-radius: 4px; /* Rounded corners */
+  cursor: pointer; /* Pointer cursor */
+  transition: background-color 0.2s ease, border-color 0.2s ease; /* Smooth transitions */
+  font-size: 0.8rem; /* Font size */
+  font-weight: 500; /* Medium weight */
+}
+
+/* Hover state for Cancel Issue button */
+.cancel-issue-btn:hover {
+    background-color: #ffa726; /* Darker orange background */
+    border-color: #fb8c00; /* Darker orange border */
+    color: #333; /* Slightly darker text */
+}
+
+/* Handle Issue button */
+.handle-issue-btn {
+  background-color: #ffeb3b; /* Bright yellow background */
+  color: #333; /* Dark text */
+  border: 1px solid #c9bc1f; /* Dark yellow border */
+  padding: 6px 12px; /* Padding */
+  border-radius: 4px; /* Rounded corners */
+  cursor: pointer; /* Pointer cursor */
+  transition: background-color 0.2s ease, border-color 0.2s ease, color 0.2s ease; /* Smooth transitions */
+  font-size: 0.8rem; /* Font size */
+  font-weight: 500; /* Medium weight */
+}
+
+/* Hover state for Handle Issue button */
+.handle-issue-btn:hover {
+    background-color: #fdd835; /* Slightly darker yellow background */
+    border-color: #ad9d12; /* Darker yellow border */
+    color: #333; /* Keep dark text */
+}
+
+/* Style for Handle Issue button when issue is solved */
+.handle-issue-btn.solved-btn {
+  background-color: #28a745; /* Green background */
+  border: 1px solid #1e7e34; /* Darker green border */
+  color: white; /* White text */
+  cursor: pointer; /* Keep pointer cursor */
+  opacity: 1; /* Full opacity */
+}
+
+/* Hover state for solved Handle Issue button */
+.handle-issue-btn.solved-btn:hover {
+  background-color: #218838; /* Darker green background */
+  border-color: #1c7430; /* Darker green border */
+}
+
+/* Disabled state for Handle Issue button (general) */
+.handle-issue-btn:disabled {
+  pointer-events: none; /* Disable pointer events */
+  background-color: #bdbdbd; /* Grey background */
+  border-color: #9e9e9e; /* Grey border */
+  color: #757575; /* Grey text */
+  cursor: not-allowed; /* Not-allowed cursor */
+}
+
+/* =================================== */
+/* === View Mode Specific Styles === */
+/* =================================== */
+
+/* --- General Visibility Control --- */
+/* Default: Assume elements are visible unless hidden by a specific mode */
+
+/* Hide elements initially in Single or Batch mode */
+body.mode-single .building-container,
+body.mode-batch .building-container,
+body.mode-single .level-container,
+body.mode-batch .level-container,
+body.mode-single .classroom,
+body.mode-batch .classroom {
+    display: none; /* Hide by default in these modes */
+}
+
+/* Show elements marked with specific classes in Single or Batch mode */
+body.mode-single .building-container.show-building,
+body.mode-batch .building-container.show-building {
+    display: flex; /* Show building (using flex as per original style) */
+}
+body.mode-single .level-container.show-level,
+body.mode-batch .level-container.show-level {
+    display: flex; /* Show level (using flex as per original style) */
+}
+body.mode-single .classroom.show-classroom,
+body.mode-batch .classroom.show-classroom {
+    display: flex; /* Show classroom (using flex as per original style) */
+}
+
+/* --- Batch Mode Specific Styles --- */
+
+/* Hide Mute/Export buttons in Batch mode */
+body.mode-batch #muteButton,
+body.mode-batch #exportLogButton {
+    display: none;
+}
+
+/* Append room number to level title in Batch mode */
+body.mode-batch .level-title[data-batch-mode]::after {
+    content: "- Classroom " attr(data-room-number); /* Add text using data attribute */
+    font-weight: bold; /* Bold text */
+    color: black; /* Black color */
+    margin-left: 5px; /* Space before text */
+}
+
+/* Style classroom button specifically for Batch mode */
+body.mode-batch .classroom[data-batch-mode] {
+   position: relative; /* Needed for ::after pseudo-element */
+   color: transparent !important; /* Hide the original room number */
+   min-width: 120px; /* Ensure enough width for new text */
+   padding: 5px; /* Adjust padding */
+   font-weight: normal; /* Reset font weight if needed */
+}
+
+/* Add "Report Issue" text to classroom button in Batch mode */
+body.mode-batch .classroom[data-batch-mode]::after {
+  content: "Report Issue"; /* Text content */
+  position: absolute; /* Position relative to button */
+  left: 50%; /* Center horizontally */
+  top: 50%; /* Center vertically */
+  transform: translate(-50%, -50%); /* Fine-tune centering */
+  color: white; /* White text color */
+  pointer-events: none; /* Don't interfere with clicks */
+  font-size: 0.8rem; /* Font size */
+  font-weight: bold; /* Bold text */
+  white-space: nowrap; /* Prevent wrapping */
+  width: 100%; /* Full width */
+  text-align: center; /* Center text */
+}
+
+/* Disable interaction for blinking buttons in Batch mode */
+/* (These rules combine original .blink-* and .classroom[data-batch-mode] disabling) */
+.classroom[data-batch-mode].blink-red,
+.classroom[data-batch-mode].blink-yellow {
+    pointer-events: none; /* Disable clicks, hover */
+    cursor: default; /* Default cursor */
+    opacity: 0.8; /* Slightly dim */
+    user-select: none; /* Prevent text selection */
+    transform: none !important; /* Override hover transform */
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1) !important; /* Override hover shadow */
+    /* Blinking background is handled by animation */
+}
+
+/* Ensure "Report Issue" text remains visible on disabled blinking buttons */
+.classroom[data-batch-mode].blink-red::after,
+.classroom[data-batch-mode].blink-yellow::after {
+    color: white; /* Keep text white */
+    opacity: 0.8; /* Match button opacity */
+}
+
+
+/* --- Single Classroom Mode Specific Styles --- */
+/* (Using .mode-single class added to body) */
+
+/* Center the single building container */
+body.mode-single .campus-container {
+    justify-content: center;
+    padding: 10px; /* Reduce padding */
+}
+
+/* Adjust width and center the single visible building */
+body.mode-single .building-container.show-building {
+    max-width: 400px; /* Allow more width */
+    margin: 0 auto; /* Center horizontally */
+}
+
+/* Center the single visible level */
+body.mode-single .level-container.show-level {
+     margin: 0 auto; /* Center horizontally */
+}
+
+/* Center the single visible classroom within its grid */
+body.mode-single .classroom-grid {
+     justify-content: center;
+}
+
+/* --- View Only Mode Specific Styles --- */
+/* (Using .view-only class added to body) */
+
+/* Disable interaction with classroom buttons */
+body.view-only .classroom {
+    pointer-events: none; /* Disable clicks, hover */
+    opacity: 0.7; /* Dim slightly */
+    cursor: not-allowed; /* Not-allowed cursor */
+}
+
+/* Optionally disable interaction with issue card action buttons */
+body.view-only .issue-card-actions button {
+    pointer-events: none; /* Disable clicks, hover */
+    opacity: 0.5; /* Dim more significantly */
+    cursor: not-allowed; /* Not-allowed cursor */
+}
+
+/* Hide Mute/Export buttons in View Only mode */
+body.view-only #muteButton,
+body.view-only #exportLogButton {
+    display: none;
+}
+
+
+/* =================================== */
+/* === Effects === */
+/* =================================== */
+
+/* Blur effect for main content when a modal is open */
+/* (Applied by adding .blurred class to #mainContent via JS) */
+#mainContent.blurred {
+  filter: blur(4px); /* Apply blur filter */
+  pointer-events: none; /* Disable interaction with blurred content */
+  transition: filter 0.2s ease-out; /* Smooth transition */
+}
+
+
+/* =================================== */
+/* === Index Page Specific Styles === */ /* NEW SECTION */
+/* =================================== */
+
+body.selection-page-body {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+    min-height: 100vh;
+    padding-top: 0; /* Header is sticky, no extra padding needed here */
+}
+
+body.selection-page-body header {
+    width: 100%;
+    position: sticky; /* Make header sticky */
+    top: 0;
+    z-index: 100; /* Ensure header is above other content */
+}
+
+/* Main container for intro text and buttons on index page */
+.selection-container {
+    display: flex;
+    flex-direction: column; /* Stack intro text and button group vertically */
+    align-items: center; /* Center items horizontally */
+    gap: 25px; /* Gap between intro text and button group */
+    padding: 15px 20px; /* AMENDED: Reduced top and bottom padding from 30px */
+    margin-top: 20px; /* AMENDED: Reduced top margin from 40px */
+    width: 100%;
+    max-width: 100%; /* Overall max-width for the content block */
+    flex-grow: 1; /* Allow it to take available vertical space */
+}
+
+/* Styling for the introductory paragraph container */
+.intro-text {
+    text-align: center;
+    width: 100%; /* Controls the width of the paragraph block */
+}
+
+.intro-text p {
+    font-size: 1.6rem; /* Modern, readable size */
+    color: #4A4A4A; /* Softer dark grey for a modern feel */
+    line-height: 1.6; /* Improves readability */
+    margin: 0; /* Reset default paragraph margin */
+    margin-bottom: 30px;
+}
+
+/* Container for the selection buttons */
+.button-group {
+    display: flex;
+    flex-direction: row; /* Buttons side-by-side on larger screens */
+    justify-content: center; /* Center buttons within the group */
+    align-items: center;
+    gap: 30px; /* Gap between buttons */
+    width: 100%; /* Allow button group to span width for centering */
+}
+
+.selection-button {
+    background-color: #016751;
+    color: white;
+    border: none;
+    padding: 30px 50px;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: background-color 0.2s ease, transform 0.1s ease;
+    font-size: 1.3rem;
+    font-weight: bold;
+    text-decoration: none;
+    text-align: center;
+    min-width: 300px;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+}
+
+.selection-button:hover {
+    background-color: #01a87a;
+    transform: translateY(-3px) scale(1.03);
+}
+
+.selection-button:active {
+    transform: translateY(0px) scale(0.97);
+}
+
+
+/* =================================== */
+/* === Responsive Adjustments === */
+/* =================================== */
+@media (max-width: 1125px) {
+/* Index Page adjustments for small screens */
+  body.selection-page-body .selection-container {
+      margin-top: 20px;   /* Keep existing margin-top */
+      padding: 10px;      /* Align padding with .campus-container */
+      gap: 15px;          /* Adjusted gap for better spacing, was 10px */
+  }
+
+  body.selection-page-body .intro-text p {
+      font-size: 0.9rem;   /* Keep existing font-size */
+      line-height: 1.5;    /* Adjust line-height for smaller text */
+      margin-bottom: 15px; /* Reduce bottom margin to complement container gap */
+  }
+
+  body.selection-page-body .button-group {
+      display: flex; /* Ensure flex is explicitly set, though likely inherited */
+      flex-direction: column; /* This makes the buttons stack vertically */
+      align-items: center; /* Optional: centers buttons if their widths are not 100% */
+      gap: 10px;          /* Reduce gap between stacked buttons */
+      width: 100%;        /* Ensure group takes width for 100% buttons */
+  }
+
+  body.selection-page-body .selection-button {
+      font-size: 1rem;    /* Reduce font size */
+      padding: 15px;      /* Standardized padding */
+      width: 95%;        /* Make buttons nearly full-width for easy tapping, was 100% */
+      max-width: 400px;  /* Good practice to have a max-width */
+      min-width: unset;   /* Remove min-width as width is percentage-based */
+      box-sizing: border-box; /* Ensures padding doesn't make it wider than 95% */
+  }
+}
+
+/* Medium screens (Tablets, smaller desktops) */
+@media (max-width: 768px) {
+  /* Adjust header layout */
+  header {
+    padding: 10px 15px;
+  }
+
+  .back-button {
+    width: 38px;
+    height: 38px;
+    margin-right: 8px;
+  }
+  .back-button .back-arrow-icon {
+    width: 22px;
+    height: 22px;
+  }
+
+  h1 {
+    font-size: 1.6rem;
+    margin-left: 10px;
+    margin-right: 10px;
+  }
+
+  .logo {
+    height: 50px;
+  }
+
+  .header-controls {
+      gap: 10px;
+  }
+
+  .mute-button {
+    font-size: 1.3rem;
+  }
+
+  #exportLogButton {
+    padding: 5px 8px;
+    font-size: 0.75rem;
+  }
+
+  .campus-container {
+    padding: 10px;
+    gap: 10px;
+  }
+
+  .building-container {
+    max-width: 95%;
+    min-width: 0;
+    padding: 12px;
+  }
+
+  .classroom {
+      width: 60px;
+      height: 40px;
+      font-size: 0.9rem;
+      line-height: 20px;
+  }
+
+  .modal-content {
+    padding: 20px;
+    padding-top: 45px;
+    max-width: 90%;
+  }
+
+  .issue-buttons button.issue-btn {
+    flex-basis: calc(50% - 10px);
+  }
+
+  /* Index Page adjustments for small screens */
+  body.selection-page-body .selection-container {
+      margin-top: 20px;   /* Keep existing margin-top */
+      padding: 10px;      /* Align padding with .campus-container */
+      gap: 15px;          /* Adjusted gap for better spacing, was 10px */
+  }
+
+  body.selection-page-body .intro-text p {
+      font-size: 0.9rem;   /* Keep existing font-size */
+      line-height: 1.5;    /* Adjust line-height for smaller text */
+      margin-bottom: 15px; /* Reduce bottom margin to complement container gap */
+  }
+
+  body.selection-page-body .button-group {
+      display: flex; /* Ensure flex is explicitly set, though likely inherited */
+      flex-direction: column; /* This makes the buttons stack vertically */
+      align-items: center; /* Optional: centers buttons if their widths are not 100% */
+      gap: 10px;          /* Reduce gap between stacked buttons */
+      width: 100%;        /* Ensure group takes width for 100% buttons */
+  }
+
+  body.selection-page-body .selection-button {
+      font-size: 1rem;    /* Reduce font size */
+      padding: 15px;      /* Standardized padding */
+      width: 95%;        /* Make buttons nearly full-width for easy tapping, was 100% */
+      max-width: 400px;  /* Good practice to have a max-width */
+      min-width: unset;   /* Remove min-width as width is percentage-based */
+      box-sizing: border-box; /* Ensures padding doesn't make it wider than 95% */
+  }
+}
+
+/* Small screens (Mobile phones) */
+@media (max-width: 480px) {
+  header {
+    padding: 8px 10px;
+  }
+  .back-button {
+    width: 36px;
+    height: 36px;
+    margin-right: 6px;
+  }
+  .back-button .back-arrow-icon {
+    width: 20px;
+    height: 20px;
+  }
+
+  header h1 {
+    font-size: 1.2rem; /* Consistent font size for header titles */
+  }
+
+  body.selection-page-body header {
+    min-height: 52px;
+  }
+
+  h1 {
+    font-size: 1.2rem;
+    margin-left: 5px;
+    margin-right: 5px;
+  }
+  .logo {
+    height: 40px;
+    display: none;
+  }
+  .header-controls {
+    gap: 8px;
+  }
+  .mute-button {
+    font-size: 1.2rem;
+  }
+  #exportLogButton {
+    padding: 4px 6px;
+    font-size: 0.7rem;
+  }
+
+  .classroom {
+      width: 55px;
+      height: 38px;
+      font-size: 0.85rem;
+      line-height: 18px;
+  }
+
+  .issue-buttons button.issue-btn {
+    flex-basis: 100%;
+    max-width: none;
+  }
+
+  .modal-actions {
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .modal button {
+    width: 100%;
+    margin: 0;
+    padding: 10px;
+  }
+
+  .issue-message {
+      padding: 10px;
+      font-size: 0.8rem;
+  }
+  .issue-header {
+      font-size: 0.9rem;
+  }
+
+  .cancel-issue-btn {
+      padding: 5px 10px;
+      font-size: 0.75rem;
+  }
+
+  /* Index Page adjustments for small screens */
+  body.selection-page-body .selection-container {
+      margin-top: 20px;   /* Keep existing margin-top */
+      padding: 10px;      /* Align padding with .campus-container */
+      gap: 15px;          /* Adjusted gap for better spacing, was 10px */
+  }
+
+  body.selection-page-body .intro-text p {
+      font-size: 0.9rem;   /* Keep existing font-size */
+      line-height: 1.5;    /* Adjust line-height for smaller text */
+      margin-bottom: 15px; /* Reduce bottom margin to complement container gap */
+  }
+
+  body.selection-page-body .button-group {
+      display: flex; /* Ensure flex is explicitly set, though likely inherited */
+      flex-direction: column; /* This makes the buttons stack vertically */
+      align-items: center; /* Optional: centers buttons if their widths are not 100% */
+      gap: 10px;          /* Reduce gap between stacked buttons */
+      width: 100%;        /* Ensure group takes width for 100% buttons */
+  }
+
+  body.selection-page-body .selection-button {
+      font-size: 1rem;    /* Reduce font size */
+      padding: 15px;      /* Standardized padding */
+      width: 95%;        /* Make buttons nearly full-width for easy tapping, was 100% */
+      max-width: 400px;  /* Good practice to have a max-width */
+      min-width: unset;   /* Remove min-width as width is percentage-based */
+      box-sizing: border-box; /* Ensures padding doesn't make it wider than 95% */
+  }
+}
+
+/* ======================================== */
+/* === Role Selection & Admin Auth Styles === */
+/* ======================================== */
+
+#roleSelectionContainer {
+    display: none; /* Initially hidden, JS will set to flex */
+    flex-direction: column;
+    align-items: center;
+    gap: 25px; /* Increased gap for better spacing */
+    width: 100%;
+    max-width: 600px; /* Comfortable max width for selection */
+}
+
+#roleSelectionContainer h2 {
+    text-align: center; /* Existing: Good */
+    /* AMENDED STYLES TO MATCH index.html .intro-text p: */
+    color: #4A4A4A;       /* Was: #016751 (LAU Green) */
+    margin-bottom: 20px;  /* Was: 10px. Matches intro-text p margin-bottom */
+    font-size: 1.6rem;    /* Was: 2rem. Matches intro-text p font-size */
+    font-weight: normal;  /* Standard paragraph weight (h2 is bold by default) */
+    line-height: 1.6;     /* Matches intro-text p line-height */
+}
+
+#adminAuthContainer {
+    /* This div uses .office-form-container for its base style */
+    display: none; /* Initially hidden, JS will make it block */
+}
+
+#adminAuthContainer h2 {
+    /* Inherits from .office-form-container h2 which is good */
+    font-size: 1.8rem; /* Ensure consistency if needed */
+}
+
+#adminAuthForm button[type="submit"] {
+    /* Inherits from .office-form-container button[type="submit"] */
+    margin-top: 15px; /* Ensure some space above the button */
+}
+
+#adminAuthContainer #backToRoleSelectionFromAdmin {
+    background-color: #6c757d; /* Secondary button color */
+    color: white;
+    border: none;
+    padding: 10px 25px; /* Adjusted padding */
+    border-radius: 6px;
+    cursor: pointer;
+    transition: background-color 0.2s ease, transform 0.1s ease;
+    font-size: 0.95rem; /* Adjusted font size */
+    font-weight: bold;
+    display: block; /* To allow centering with margin auto */
+    width: auto; /* Fit content */
+    min-width: 200px; /* Minimum width */
+    text-align: center;
+    margin-top: 20px; /* Space above this button */
+    margin-left: auto;
+    margin-right: auto;
+}
+
+#adminAuthContainer #backToRoleSelectionFromAdmin:hover {
+    background-color: #5a6268; /* Darker shade on hover */
+    transform: scale(1.02);
+}
+#adminAuthContainer #backToRoleSelectionFromAdmin:active {
+    transform: scale(0.98);
+}
+
+/* Ensure the actual office form container is hidden initially */
+#actualOfficeFormContainer {
+    display: none; /* JS will make it block when user role is selected */
+}
+
+/* ======================================== */
+/* === Office Support Form Styles === */
+/* ======================================== */
+
+.office-form-container {
+    max-width: 700px;
+    margin: 0 auto 30px; /* AMENDED: Set top margin to 0, kept bottom margin at 30px */
+    padding: 25px;
+    background: white;
+    border-radius: 10px;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.2); /* Consistent shadow */
+}
+
+/* Header for the form */
+.office-form-container h2 {
+    text-align: center;
+    color: #016751; /* LAU Green */
+    margin-bottom: 25px;
+    font-size: 1.8rem; /* Page context title size */
+}
+
+/* Labels for form fields */
+.office-form-container label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: bold;
+    color: #555; /* Consistent label color */
+}
+
+/* Styling for the red asterisk on required fields */
+.office-form-container label .required-star {
+    color: red;
+    margin-left: 3px;
+}
+/* General required star if used outside a label in the form */
+.office-form-container .required-star {
+    color: red;
+}
+
+
+/* Input fields (text, tel), select dropdowns, and textarea */
+.office-form-container input[type="text"],
+.office-form-container input[type="tel"],
+.office-form-container select,
+.office-form-container textarea {
+    width: 100%;
+    padding: 12px;
+    margin-bottom: 18px;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    box-sizing: border-box;
+    font-size: 1rem;
+    color: #333; /* Default text color for input */
+}
+
+/* Readonly input styling */
+.office-form-container input[readonly] {
+    background-color: #e9ecef;
+    cursor: not-allowed;
+}
+
+/* Focus states for form elements */
+.office-form-container input[type="text"]:focus,
+.office-form-container input[type="tel"]:focus,
+.office-form-container select:focus,
+.office-form-container textarea:focus {
+    outline: none;
+    border-color: #016751; /* Theme green */
+    box-shadow: 0 0 0 2px rgba(1, 103, 81, 0.2); /* Theme green focus ring */
+}
+
+/* Custom styling for select dropdown arrow */
+.office-form-container select {
+    appearance: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    background-image: url('data:image/svg+xml;charset=US-ASCII,<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="%23555" viewBox="0 0 16 16"><path fill-rule="evenodd" d="M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z"/></svg>');
+    background-repeat: no-repeat;
+    background-position: right 12px center;
+    background-size: 16px 12px;
+    padding-right: 35px; /* Ensure space for the arrow */
+}
+.office-form-container select:focus { /* Ensure focus outline doesn't get cut by padding */
+     padding-right: 35px; /* Maintain padding on focus */
+}
+
+
+/* Checkbox specific styling for remote assistance */
+.office-form-container input[type="checkbox"] {
+    width: auto; /* Checkboxes shouldn't be full width */
+    margin-right: 8px;
+    vertical-align: middle; /* Align with label text */
+    height: auto; /* browser default is fine */
+}
+.office-form-container label[for="remoteAssistanceCheckbox"] {
+    display: inline-block; /* For better alignment with checkbox */
+    font-weight: normal; /* Less prominent than main field labels */
+    color: #333;
+    margin-bottom: 18px; /* Consistent bottom margin */
+}
+
+/* Container for AnyDesk input field (conditionally shown) */
+.anydesk-container {
+    /* display: none; is handled by inline style + JS */
+    margin-bottom: 18px; /* Ensure spacing when visible */
+}
+/* Label and input within .anydesk-container will inherit from general rules above */
+
+
+/* Submit button */
+.office-form-container button[type="submit"] {
+    background-color: #016751; /* LAU Green */
+    color: white;
+    padding: 12px 25px;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 1rem; /* Consistent button font size */
+    font-weight: bold;
+    display: block;
+    width: 100%;
+    transition: background-color 0.2s ease, transform 0.1s ease;
+    margin-top: 10px; /* Space above submit button */
+}
+
+/* Hover state for submit button */
+.office-form-container button[type="submit"]:hover {
+    background-color: #01a87a; /* Brighter LAU Green */
+    transform: scale(1.02);
+}
+
+/* Active state for submit button */
+.office-form-container button[type="submit"]:active {
+    transform: scale(0.98);
+}
+
+
+/* Disabled state for submit button */
+.office-form-container button[type="submit"]:disabled {
+    background-color: #bdbdbd;
+    color: #757575;
+    cursor: not-allowed;
+    transform: none;
+}
+
+/* Error message for textarea word count or other field errors */
+.office-form-container .error-message {
+    color: red;
+    font-size: 0.9em;
+    margin-top: -10px; /* Adjusts spacing below the field it relates to */
+    margin-bottom: 10px; /* Space before the next element */
+    display: block; /* Ensure it takes its own line */
+}
+
+#adminLoginModalForm button[type="submit"] {
+    display: block; /* Ensure it's a block element */
+    margin-left: auto; /* Center horizontally */
+    margin-right: auto; /* Center horizontally */
+    margin-top: 20px; /* Space above the button */
+    /* It will inherit other styles like color, padding from .modal button */
+    min-width: 120px; /* Adjust as needed, e.g., to fit "Submit" text comfortably */
+}
+
+/* =================================== */
+/* === Responsive Adjustments (Relevant to Office Page) === */
+/* =================================== */
+@media (max-width: 1125px) {
+  /* Adjustments for .selection-container which wraps office form */
+  body.selection-page-body .selection-container {
+    margin-top: 15px;   /* AMENDED: Reduced top margin for mobile */
+    padding: 10px;      /* Reduced padding */
+    gap: 15px;
+}
+}
+
+/* Medium screens (Tablets, smaller desktops) */
+@media (max-width: 768px) {
+  /* Header adjustments */
+  header {
+    padding: 10px 15px;
+  }
+  .back-button {
+    width: 38px;
+    height: 38px;
+    margin-right: 8px;
+  }
+  .back-button .back-arrow-icon {
+    width: 22px;
+    height: 22px;
+  }
+  h1 { /* General H1, affects header H1 if not specifically overridden */
+    font-size: 1.6rem;
+    margin-left: 10px;
+    margin-right: 10px;
+  }
+   header h1 { /* Specific for header H1 */
+    font-size: 1.6rem;
+  }
+  .logo {
+    height: 50px;
+  }
+
+  /* Office Page Specific Adjustments for Tablets */
+  .office-form-container {
+      padding: 20px;
+      margin-left: 15px; /* Add some horizontal margin for the container */
+      margin-right: 15px;
+      max-width: calc(100% - 30px); /* Ensure it doesn't touch screen edges */
+  }
+  .office-form-container h2 {
+      font-size: 1.6rem;
+  }
+}
+
+/* Small screens (Mobile phones) */
+@media (max-width: 480px) {
+  /* Header adjustments */
+  header {
+    padding: 8px 10px;
+  }
+  .back-button {
+    width: 36px;
+    height: 36px;
+    margin-right: 6px;
+  }
+  .back-button .back-arrow-icon {
+    width: 20px;
+    height: 20px;
+  }
+  h1 { /* General H1 */
+    font-size: 1.2rem; /* Fallback size */
+    margin-left: 5px;
+    margin-right: 5px;
+  }
+  header h1 { /* Specific for header H1 */
+    font-size: 1.2rem;
+  }
+  .logo {
+    height: 40px;
+    display: none; /* Hide logo on very small screens */
+  }
+
+  /* Office Page Specific Adjustments for Mobile */
+  .office-form-container {
+    padding: 15px;
+    margin-top: 0; /* AMENDED: Removed the specific top margin for mobile view */
+    margin-bottom: 15px;
+    margin-left: 10px; /* Horizontal margin for office form */
+    margin-right: 10px;
+    max-width: calc(100% - 20px); /* Ensure it doesn't touch screen edges */
+}
+  .office-form-container h2 {
+      font-size: 1.4rem;
+      margin-bottom: 20px;
+  }
+  .office-form-container input[type="text"],
+  .office-form-container input[type="tel"],
+  .office-form-container select,
+  .office-form-container textarea {
+      padding: 10px;
+      margin-bottom: 15px;
+      font-size: 0.9rem; /* Slightly smaller font for inputs on mobile */
+  }
+  .office-form-container button[type="submit"] {
+      padding: 10px; /* Reduced padding for smaller buttons */
+      font-size: 0.95rem; /* Adjust font size for button */
+  }
+  .office-form-container label {
+      font-size: 0.9rem; /* Adjust label font size */
+      margin-bottom: 6px; /* Adjust label margin */
+  }
+  .office-form-container label[for="remoteAssistanceCheckbox"] {
+        font-size: 0.85rem; /* Slightly smaller for checkbox label */
+    }
+
+  /* Adjustments for .selection-container (which is main#mainContent) on small screens */
+  body.selection-page-body .selection-container {
+      margin-top: 20px;   /* Further fine-tune top margin if needed */
+      padding: 10px;      /* Reduced padding */
+      gap: 15px;
+  }
+}
+
+/* ======================================== */
+/* === Admin Dashboard Sections & Issues === */
+/* ======================================== */
+main#mainContent.main-content-admin-active {
+    margin-top: 0 !important; /* Override the default margin-top of .selection-container */
+    padding-top: 0 !important; /* Override the default padding-top of .selection-container */
+    /* Horizontal and bottom padding will still be inherited from .selection-container */
+}
+
+#adminDashboardContainer.office-form-container {
+    max-width: none; /* Remove any max-width constraint from .office-form-container */
+    width: 100%;     /* Make the dashboard take the full width of its parent's content area */
+    margin-top: 20px; /* Retain the top margin from the original inline style */
+    margin-bottom: 20px; /* Add some bottom margin for spacing */
+    margin-left: 0;   /* Remove auto horizontal margins to prevent centering */
+    margin-right: 0;  /* Remove auto horizontal margins */
+    padding: 15px;    /* Adjust padding inside the dashboard container itself as needed */
+    box-sizing: border-box; /* Ensures padding and border are included in the 100% width */
+    display: flex;          /* Enable flex layout for its children (h2, sections, button) */
+    flex-direction: column; /* Stack children vertically */
+    flex-grow: 1;      
+}
+
+.admin-dashboard-sections {
+    display: flex;
+    flex-direction: column;
+    gap: 20px; /* Space between sections */
+    margin-top: 20px;
+    flex-grow: 1; /* Allow this wrapper to take up available space between dashboard title and bottom button */
+    min-height: 0; 
+}
+
+.dashboard-section {
+    background-color: #f9f9f9;
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    padding: 15px;
+    flex: 1; /* Allow sections to grow equally if in a row */
+    min-width: 280px; /* Minimum width for a section */
+    display: flex;          /* Enable flex layout for its children (h3, issues-list) */
+    flex-direction: column;
+}
+
+.dashboard-section h3 {
+    margin-top: 0;
+    margin-bottom: 15px;
+    color: #016751; /* LAU Green */
+    padding-bottom: 10px;
+    border-bottom: 2px solid #e0e0e0;
+    font-size: 1.4rem;
+    flex-shrink: 0; 
+}
+
+.issues-list {
+    overflow-y: auto; /* Scroll if content overflows */
+    padding-right: 10px; /* Space for scrollbar */
+    flex-grow: 1;        /* Allow the issues list to take available vertical space within its .dashboard-section */
+    min-height: 0;
+}
+
+/* Styling for individual issue items in the dashboard */
+.dashboard-issue-item {
+    background-color: #ffffff; /* White background for items */
+    border: 1px solid #ddd;
+    /* border-left is now set by status class */
+    padding: 15px;
+    margin-bottom: 15px;
+    border-radius: 5px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+}
+
+/* Status-specific border colors */
+.dashboard-issue-item.status-reported {
+    border-left: 5px solid #e53935; /* Red for Reported */
+}
+.dashboard-issue-item.status-pending {
+    border-left: 5px solid #ffb300; /* Yellow/Amber for Pending */
+}
+.dashboard-issue-item.status-completed {
+    border-left: 5px solid #43a047; /* Green for Completed */
+}
+
+.dashboard-issue-item h4 {
+    margin-top: 0;
+    margin-bottom: 10px;
+    color: #333; /* Darker color for issue title */
+    font-size: 1.1rem;
+}
+.dashboard-issue-item p {
+    margin-bottom: 5px;
+    font-size: 0.9rem;
+    line-height: 1.4;
+}
+.dashboard-issue-item p strong {
+    color: #000; /* Black for strong text */
+}
+.dashboard-issue-item .timestamp {
+    font-size: 0.8rem;
+    color: #777;
+    margin-top: 10px;
+}
+.dashboard-issue-item .status-text {
+    font-weight: bold;
+}
+
+/* Action buttons within each issue item */
+.issue-actions {
+    margin-top: 15px;
+    padding-top: 10px;
+    border-top: 1px solid #eee;
+    display: flex;
+    gap: 10px; /* Space between buttons */
+    align-items: center; /* Align items vertically */
+    flex-wrap: wrap; /* Allow buttons to wrap on smaller screens */
+}
+
+.issue-actions .action-btn {
+    padding: 6px 12px;
+    font-size: 0.85rem;
+    border-radius: 4px;
+    cursor: pointer;
+    border: 1px solid transparent;
+    transition: background-color 0.2s ease, border-color 0.2s ease, color 0.2s ease;
+    font-weight: 500;
+}
+
+.issue-actions .action-btn:disabled {
+    background-color: #e0e0e0 !important;
+    color: #9e9e9e !important;
+    border-color: #d0d0d0 !important;
+    cursor: not-allowed;
+    transform: none;
+}
+
+.issue-actions .pending-btn {
+    background-color: #ffecb3; /* Light Yellow */
+    border-color: #ffe082;
+    color: #795548; /* Brownish text */
+}
+.issue-actions .pending-btn:hover:not(:disabled) {
+    background-color: #ffe082;
+    border-color: #ffd54f;
+    transform: translateY(-1px);
+}
+
+.issue-actions .completed-btn {
+    background-color: #c8e6c9; /* Light Green */
+    border-color: #a5d6a7;
+    color: #2e7d32; /* Dark Green text */
+}
+.issue-actions .completed-btn:hover:not(:disabled) {
+    background-color: #a5d6a7;
+    border-color: #81c784;
+    transform: translateY(-1px);
+}
+
+.issue-actions .delete-btn {
+    background-color: transparent; 
+    border: none;
+    color: red;
+    margin-left: auto; 
+    font-size: 1.2rem;
+    padding: 4px 8px;
+}
+.issue-actions .delete-btn:hover:not(:disabled) {
+    background-color: transparent;
+    color: #d32f2f;
+    transform: scale(1.15);
+}
+
+.issue-actions .delete-btn:disabled {
+    background-color: transparent !important; /* Still no background */
+    color: #bdbdbd !important; /* Greyed out color for disabled state */
+    border: none !important; /* Still no border */
+    cursor: not-allowed;
+    transform: none; /* No hover effect when disabled */
+}
+
+
+/* Responsive adjustments for admin dashboard sections */
+@media (min-width: 1400px) { /* Apply side-by-side layout for larger screens */
+    .admin-dashboard-sections {
+        flex-direction: row; /* Sections side-by-side */
+    }
+}
+
+@media (max-width: 480px) {
+    .dashboard-section h3 {
+        font-size: 1.2rem;
+    }
+    .issue-actions {
+        flex-direction: column; /* Stack buttons vertically on very small screens */
+        align-items: stretch; /* Make buttons full width of their container */
+    }
+    .issue-actions .delete-btn {
+        margin-left: 0; /* Reset margin for stacked layout */
+        margin-top: 8px; /* Add some space if stacked */
+    }
+}
+
+/* Add this style for centering the support login submit button */
+#supportLoginModalForm button[type="submit"] {
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+    margin-top: 20px;
+    min-width: 120px; /* Adjust as needed */
+}
+
+/* Style for the new Support Handle Issue Modal */
+.staff-select {
+  width: 100%;
+  padding: 12px;
+  margin-bottom: 15px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  background-color: white;
+  font-size: 1rem;
+  cursor: pointer;
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  background-image: url('data:image/svg+xml;charset=US-ASCII,<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="%23555" viewBox="0 0 16 16"><path fill-rule="evenodd" d="M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z"/></svg>');
+  background-repeat: no-repeat;
+  background-position: right 12px center;
+  background-size: 16px 12px;
+}
+.staff-select:focus {
+  border-color: #016751;
+  box-shadow: 0 0 0 2px rgba(1, 103, 81, 0.2);
+  outline: none;
+}
+#supportHandleIssueModal .modal-content button[type="submit"] {
+    background-color: #016751;
+    color: white;
+    border: none;
+    padding: 12px 25px;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: background-color 0.2s ease, transform 0.1s ease;
+    font-size: 1rem;
+    font-weight: bold;
+    width: auto;
+    min-width: 100px;
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+    margin-top: 15px;
+}
+#supportHandleIssueModal .modal-content button[type="submit"]:hover {
+    background-color: #01a87a;
+    transform: scale(1.02);
+}
+#supportHandleIssueModal .modal-content button[type="submit"]:disabled {
+    background-color: #bdbdbd;
+    cursor: not-allowed;
+    transform: none;
+    color: #757575;
+}
+
+/* Styles for Completion Note Modal */
+#completionNoteModal .modal-content button[type="submit"] {
+    background-color: #016751; color: white; border: none; padding: 12px 25px;
+    border-radius: 6px; cursor: pointer; transition: background-color 0.2s ease, transform 0.1s ease;
+    font-size: 1rem; font-weight: bold; width: auto; min-width: 100px;
+    display: block; margin-left: auto; margin-right: auto; margin-top: 15px;
+}
+#completionNoteModal .modal-content button[type="submit"]:hover {
+    background-color: #01a87a; transform: scale(1.02);
+}
+#completionNoteModal .modal-content button[type="submit"]:disabled {
+    background-color: #bdbdbd; cursor: not-allowed; transform: none; color: #757575;
+}
+#completionNoteModal #completionNoteText {
+    width: 100%; padding: 12px; margin-bottom: 5px;
+    border: 1px solid #ccc; border-radius: 6px; font-size: 1rem; min-height: 80px;
+}
+#completionNoteModal #completionNoteText:focus {
+    outline: none; border-color: #016751; box-shadow: 0 0 0 2px rgba(1, 103, 81, 0.2);
+}
+#completionNoteModal #completionNoteError {
+    margin-top: 0;
+    margin-bottom: 15px;
+}
+
+/* Ensure the export button in admin dashboard is styled like the classroom one */
+#adminDashboardContainer #exportOfficeLogButton {
+  background-color: #f8f9fa; /* Light background */
+  color: #016751; /* Theme green text color */
+  border: 1px solid #dee2e6; /* Subtle border */
+  padding: 6px 12px; /* Padding */
+  border-radius: 6px; /* Rounded corners */
+  cursor: pointer; /* Pointer cursor */
+  font-size: 0.85rem; /* Font size */
+  font-weight: 500; /* Medium font weight */
+  transition: background-color 0.2s ease, border-color 0.2s ease, transform 0.1s ease, box-shadow 0.2s ease; /* Smooth transitions */
+  white-space: nowrap; /* Prevent text wrapping */
+  box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+}
+
+#adminDashboardContainer #exportOfficeLogButton:hover {
+  background-color: #e9ecef; /* Slightly darker background */
+  border-color: #ced4da; /* Slightly darker border */
+  transform: translateY(-1px); /* Slight lift effect */
+  box-shadow: 0 2px 4px rgba(0,0,0,0.08);
+}
+
+#adminDashboardContainer #exportOfficeLogButton:active {
+  transform: translateY(0px); /* Reset lift effect */
+  background-color: #dee2e6; /* Darker background */
+  box-shadow: inset 0 1px 1px rgba(0,0,0,0.1);
+}
+
+#adminDashboardContainer #exportOfficeLogButton:disabled {
+  background-color: #e9ecef;
+  color: #adb5bd;
+  cursor: not-allowed;
+  transform: none;
+  border-color: #e0e0e0;
+  box-shadow: none;
+}
+
+
+/* Styles for Office Export Log Modal (reusing general modal styles where possible) */
+#officeExportLogModal .modal-content {
+    max-width: 550px; /* Slightly wider for more filter options */
+}
+
+
+/* Specifics for office export filter sections if needed, leveraging existing styles from classroom export */
+#officeExportLogModal .modal-content > div[style*="margin-top: 10px"] {
+  margin-bottom: 15px;
+}
+
+#officeExportLogModal .modal-content > div > label:first-child {
+  display: block;
+  margin-bottom: 8px;
+  font-weight: bold;
+  color: #333;
+  font-size: 0.95rem;
+}
+
+#officeExportBuildingCheckboxes,
+#officeExportRoomCheckboxes {
+  background-color: #f9f9f9;
+  border: 1px solid #dcdcdc;
+  border-radius: 4px;
+  padding: 8px 10px;
+  max-height: 150px;
+  overflow-y: auto;
+  margin-top: 5px;
+}
+
+#officeExportRoomModeSelection {
+  border: 1px solid #dcdcdc;
+  background-color: #f9f9f9;
+  border-radius: 4px;
+  padding: 8px 10px;
+  margin-top: 5px;
+}
+
+#officeExportBuildingCheckboxes div,
+#officeExportRoomModeSelection div,
+#officeExportRoomCheckboxes div {
+  padding: 4px 0;
+  display: flex;
+  align-items: center;
+}
+
+#officeExportBuildingCheckboxes label,
+#officeExportRoomModeSelection label,
+#officeExportRoomCheckboxes label {
+  margin-left: 8px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  color: #444;
+}
+
+#officeExportBuildingCheckboxes label[for="office_export_building_all"],
+#officeExportRoomCheckboxes label[for="office_export_room_all_subset"] {
+  font-weight: bold;
+  color: #111;
+}
+
+#officeExportSpecificRoomSelection {
+  border-top: 1px dashed #ccc;
+  padding-top: 15px;
+  margin-top: 15px;
+}
+
+#officeExportSpecificRoomSelection > label:first-child {
+  font-style: italic;
+  margin-bottom: 8px;
+  font-weight: bold;
+}
+
+#officeExportLogModal input[type="checkbox"],
+#officeExportLogModal input[type="radio"] {
+  margin: 0;
+  vertical-align: middle;
+  width: 15px;
+  height: 15px;
+  cursor: pointer;
+}
+
+#officeExportLogModal #officeExportHandledByInput,
+#officeExportLogModal #officeExportStartDate,
+#officeExportLogModal #officeExportEndDate {
+  /* Inherits general modal input styles: .modal input[type="text"], .modal input[type="date"] */
+  padding: 10px; /* Consistent padding */
+}
+
+#officeExportLogModal #submitOfficeExportLog {
+  /* Inherits .modal button styles */
+  margin-top: 25px;
+}
+
+#officeExportLogModal #officeExportStatusMessage,
+#officeExportAuthModal #officeExportErrorMessage {
+    /* Inherits from #exportStatusMessage or .error-message */
+    text-align: center;
+    width: 100%;
+    padding: 10px 5px;
+    margin-top: 10px;
+}
+#officeExportLogModal #officeExportStatusMessage {
+    font-weight: 500;
+    font-size: 0.9rem;
+    min-height: 20px;
+}
+#officeExportAuthModal #officeExportErrorMessage { /* From .modal #error-message */
+    color: red;
+    display: none; /* JS handles display */
+}
+
+
+/* Responsive adjustments for the new export button in admin dashboard */
+@media (max-width: 768px) {
+  #adminDashboardContainer #exportOfficeLogButton {
+    padding: 5px 8px;
+    font-size: 0.75rem;
+  }
+  #officeExportLogModal .modal-content {
+    max-width: 90%; 
+  }
+}
+
+@media (max-width: 480px) {
+  #adminDashboardContainer {
+    padding: 10px;
+  }
+  #adminDashboardContainer > div:first-child { /* Flex container for h2 and button */
+    flex-direction: column;
+    align-items: flex-start; /* Align items to the start */
+    gap: 10px; /* Add gap between title and button when stacked */
+  }
+  #adminDashboardContainer h2 {
+    font-size: 1.3rem; /* Match H1 on small screens */
+    width: 100%; /* Ensure it takes full width for text-align if needed */
+    text-align: left; /* Align title to left */
+  }
+  #adminDashboardContainer #exportOfficeLogButton {
+    padding: 6px 10px; /* Slightly more padding for better touch */
+    font-size: 0.8rem; /* Slightly larger font */
+    width: 100%; /* Make button full width */
+    text-align: center; /* Center text in button */
+  }
+   #officeExportLogModal .modal-content {
+    padding: 15px;
+    padding-top: 40px; /* Space for close button */
+  }
+}
+
+.modal {
+    display: none; 
+    position: fixed; 
+    z-index: 1000; 
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    overflow: auto; 
+    background-color: rgba(0,0,0,0.6); 
+    justify-content: center;
+    align-items: center;
+}
+.modal-content {
+    background-color: #fefefe;
+    margin: auto;
+    padding: 20px;
+    border: 1px solid #888;
+    width: 80%;
+    max-width: 400px;
+    text-align: center;
+    border-radius: 8px;
+}
+.blurred {
+    filter: blur(5px);
+    pointer-events: none;
+    transition: filter 0.3s ease-in-out;
+}
+
+/* ======================================================== */
+/* === Classroom Page - Export Button Layout Correction === */
+/* ======================================================== */
+
+/* This new container holds the title and export button in classroom pages, matching the office page's layout. */
+#classroomDashboardHeader > div {
+    padding: 10px;
+    border-radius: 8px;
+    background-color: #f9f9f9;
+    border: 1px solid #e0e0e0;
+}
+
+/* Ensures the export button uses the correct, consistent styling. */
+#classroomDashboardHeader #exportLogButton {
+    background-color: #f8f9fa;
+    color: #016751;
+    border: 1px solid #dee2e6;
+    padding: 6px 12px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 0.85rem;
+    font-weight: 500;
+    transition: background-color 0.2s ease, border-color 0.2s ease, transform 0.1s ease, box-shadow 0.2s ease;
+    white-space: nowrap;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+}
+
+/* Hover state for the export button. */
+#classroomDashboardHeader #exportLogButton:hover {
+  background-color: #e9ecef;
+  border-color: #ced4da;
+  transform: translateY(-1px);
+  box-shadow: 0 2px 4px rgba(0,0,0,0.08);
+}
+
+/* Disabled state for the export button. */
+#classroomDashboardHeader #exportLogButton:disabled {
+  background-color: #e9ecef;
+  color: #adb5bd;
+  cursor: not-allowed;
+  transform: none;
+  border-color: #e0e0e0;
+  box-shadow: none;
+}
+
+
+/* ================================================= */
+/* === Responsive Rules to Match Office Dashboard === */
+/* ================================================= */
+
+@media (max-width: 768px) {
+    #classroomDashboardHeader h2 {
+        font-size: 1.6rem !important; /* Matches tablet-sized titles. */
+    }
+}
+
+@media (max-width: 480px) {
+    /* Stacks the title and button vertically on small screens. */
+    #classroomDashboardHeader > div {
+        flex-direction: column;
+        align-items: stretch !important; /* Overrides inline styles to ensure full width. */
+    }
+
+    /* Styles the title for the stacked mobile layout. */
+    #classroomDashboardHeader h2 {
+        font-size: 1.4rem !important;
+        text-align: center;
+        margin-bottom: 10px !important;
+    }
+
+    /* Makes the export button full-width and larger for easy tapping on mobile. */
+    #classroomDashboardHeader #exportLogButton {
+        width: 100%;
+        text-align: center;
+        padding: 10px;
+        font-size: 0.95rem;
+    }
+}
+
+/* ======================================== */
+/* === Main Controls (Export Button) === */
+/* ======================================== */
+
+.main-controls {
+    width: 100%;
+    max-width: 2500px; /* Match the max-width of campus-container */
+    padding: 0 15px; /* Match horizontal padding of campus-container */
+    margin-top: 15px;
+    margin-bottom: 0px; /* Space between the button and the buildings */
+    text-align: center; /* Center the button within the container */
+    box-sizing: border-box; /* Ensures padding is included in width calculations */
+}
+
+.main-controls #exportLogButton {
+    /* Reusing styles from the original #exportLogButton for consistency */
+    background-color: #f8f9fa;
+    color: #016751;
+    border: 1px solid #dee2e6;
+    padding: 8px 16px; /* Slightly larger padding for better visibility */
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 0.9rem; /* Consistent font size */
+    font-weight: 500;
+    transition: background-color 0.2s ease, border-color 0.2s ease, transform 0.1s ease, box-shadow 0.2s ease;
+    white-space: nowrap;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+}
+
+.main-controls #exportLogButton:hover {
+    background-color: #e9ecef;
+    border-color: #ced4da;
+    transform: translateY(-1px);
+    box-shadow: 0 2px 4px rgba(0,0,0,0.08);
+}
+
+.main-controls #exportLogButton:disabled {
+    background-color: #e9ecef;
+    color: #adb5bd;
+    cursor: not-allowed;
+    transform: none;
+    box-shadow: none;
+}
+
+/* === Completed Section Header Fix === */
+
+/* This rule targets ONLY the container in the "Completed" section */
+#completedIssuesSection .section-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    
+    /* These styles are moved from the h3 to its parent container */
+    /* so the bottom border spans the full width underneath both items. */
+    margin-bottom: 15px;
+    padding-bottom: 10px;
+    border-bottom: 2px solid #e0e0e0;
+}
+
+/* This targets ONLY the h3 inside the "Completed" section's header */
+/* to remove the original underline, which is now on the parent. */
+#completedIssuesSection .section-header h3 {
+    margin-bottom: 0;
+    padding-bottom: 0;
+    border-bottom: none;
+}
+
+/* This rule styles the "Clear All" button */
+#completedIssuesSection .action-btn.clear-all-btn {
+    background-color: #fce4e4;
+    border: 1px solid #f7b2b2;
+    color: #c62828;
+    padding: 4px 10px;
+    font-size: 0.8rem;
+    font-weight: bold;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.2s ease, transform 0.1s ease;
+}
+
+#completedIssuesSection .action-btn.clear-all-btn:hover:not(:disabled) {
+    background-color: #f7b2b2;
+    border-color: #e57373;
+    transform: translateY(-1px);
+}
+
+ body.auth-wall-active header,
+        body.auth-wall-active main,
+        body.auth-wall-active .main-controls {
+            display: none !important;
+        }
+
+        body.auth-wall-active #authModal {
+            display: flex !important;
+        }

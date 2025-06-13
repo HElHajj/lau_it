@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="theme-color" content="#016751">
+    <link rel="manifest" href="manifest.json">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LAU Support System</title>
+    <link rel="icon" href="pics/lau_icon.png" type="image/x-icon">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body class="selection-page-body">
+
+    <div id="splashScreen">
+        <img src="pics/lau_logo_entry.png" alt="LAU Logo" id="splashLogo">
+    </div>
+    <div id="authModal" class="modal">
+        <div class="modal-content">
+            <h2>Enter Access Code</h2>
+            <input type="password" id="authCode" placeholder="Enter code">
+            <button id="submitAuth">Submit</button>
+            <p id="error-message" style="color: red; display: none;">Incorrect code, try again.</p>
+        </div>
+    </div>
+    <header>
+        <img src="pics/lau_logo.png" alt="University Logo" class="logo" width="150" height="60">
+        <h1>LAU Support System</h1>
+    </header>
+
+    <main id="mainContent" class="selection-container">
+        <div class="intro-text">
+            <p>Welcome to LAU Support System. Select the relevant location for your issue and submit your request so our team can help you soon.</p>
+        </div>
+        <div class="button-group">
+            <a href="beirut_classrooms.html" class="selection-button">Beirut Classrooms</a>
+            <a href="byblos_classrooms.html" class="selection-button">Byblos Classrooms</a>
+            <a href="offices.html" class="selection-button">Offices</a>
+        </div>
+        <div class="intro-text" style="margin-top: 30px;">
+        <h3 style="margin-bottom: 10px;">Contact Us</h3>
+        <p style="line-height: 1.6;">
+            For immediate assistance, please reach out to our IT Support team:<br>
+            <strong>Email:</strong> <a href="mailto:it.support@lau.edu.lb" style="color: #016751;">helpdesk@lau.edu.lb</a><br>
+            <strong>Helpdesk Ext:</strong> 1000
+        </p>
+    </main>
+
+    <script type="module">
+    // Import necessary Firebase functions
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.4.0/firebase-app.js";
+    import { getAnalytics } from "https://www.gstatic.com/firebasejs/11.4.0/firebase-analytics.js";
+    import { getDatabase, ref, get } from "https://www.gstatic.com/firebasejs/11.4.0/firebase-database.js";
+    import { firebaseConfig } from './config.js';
+
+    try {
+        // --- 1. INITIALIZE FIREBASE ---
+        const app = initializeApp(firebaseConfig);
+        const analytics = getAnalytics(app);
+        const database = getDatabase(app);
+        console.log("🔥 Firebase initialized successfully in index.html.");
+
+        // --- 2. GET DOM ELEMENTS ---
+        const authModal = document.getElementById('authModal');
+        const mainContent = document.getElementById('mainContent');
+        const authCodeInput = document.getElementById('authCode');
+        const submitAuthButton = document.getElementById('submitAuth');
+        const errorMessage = document.getElementById('error-message');
+
+        // --- 3. GLOBAL AUTH STATE ---
+        let authCodes = {
+            admin: null,
+            support: null,
+            user: null
+        };
+
+        // --- 4. AUTHENTICATION LOGIC ---
+
+        /**
+         * Fetches all three authentication codes from Firebase upon page load.
+         * This ensures the application is ready to validate user input immediately.
+         */
+        async function fetchAuthCodes() {
+            // Ensure the database URL from your config does not have a trailing slash
+            const dbURL = firebaseConfig.databaseURL.replace(/\/$/, '');
+            const paths = {
+                admin: `${dbURL}/adminAuthCode.json`,
+                support: `${dbURL}/supportAuthCode.json`,
+                user: `${dbURL}/endUserAuthCode.json` // Standard user code
+            };
+
+            try {
+                // Fetch all codes in parallel for efficiency
+                const [adminRes, supportRes, userRes] = await Promise.all([
+                    fetch(paths.admin),
+                    fetch(paths.support),
+                    fetch(paths.user)
+                ]);
+
+                // Check if all network requests were successful
+                if (!adminRes.ok || !supportRes.ok || !userRes.ok) {
+                    throw new Error("One or more authentication code network responses were not ok.");
+                }
+
+                // Parse the JSON from the responses
+                authCodes.admin = await adminRes.json();
+                authCodes.support = await supportRes.json();
+                authCodes.user = await userRes.json();
+
+                console.log("✅ Authentication codes loaded successfully.");
+                
+                // Enable the form now that authentication codes are loaded.
+                authCodeInput.disabled = false;
+                submitAuthButton.disabled = false;
+                authCodeInput.placeholder = "Enter code"; // Restore placeholder text
+
+            } catch (error) {
+                console.error("❌ Failed to load authentication codes:", error);
+                errorMessage.textContent = "Could not load authentication configuration. Please refresh.";
+                errorMessage.style.display = 'block';
+                // Keep the form disabled if codes fail to load
+                authCodeInput.placeholder = "Error loading...";
+            }
+        }
+
+        /**
+         * Checks the entered code against the fetched auth codes and grants access.
+         */
+        function checkAuth() {
+            const enteredCode = authCodeInput.value.trim();
+            let userRole = null;
+
+            // Determine user role based on the entered code
+            if (enteredCode === authCodes.admin) {
+                userRole = 'admin';
+            } else if (enteredCode === authCodes.support) {
+                userRole = 'support';
+            } else if (enteredCode === authCodes.user) {
+                userRole = 'user';
+            }
+
+            if (userRole) {
+                // On successful authentication
+                console.log(`Authentication successful. Role assigned: ${userRole}`);
+                sessionStorage.setItem('userRole', userRole);
+                authModal.style.display = 'none';
+                mainContent.classList.remove("blurred");
+                errorMessage.style.display = 'none';
+            } else {
+                // On failed authentication
+                console.warn("Authentication failed: Incorrect code entered.");
+                errorMessage.style.display = 'block';
+                authCodeInput.value = ''; // Clear the incorrect input
+                authCodeInput.focus(); // Set focus back to the input field
+            }
+        }
+
+        // --- 5. ADD EVENT LISTENERS AND RUN ON PAGE LOAD ---
+        document.addEventListener("DOMContentLoaded", () => {
+            const splashScreen = document.getElementById('splashScreen');
+
+            mainContent.classList.add("blurred");
+            sessionStorage.removeItem('userRole'); // Clear any previous role
+
+            // Disable controls on load to prevent interaction before codes are fetched
+            authCodeInput.disabled = true;
+            submitAuthButton.disabled = true;
+
+            setTimeout(() => {
+                splashScreen.classList.add('hidden');
+                splashScreen.addEventListener('transitionend', () => {
+                    splashScreen.style.display = 'none';
+                    authModal.style.display = 'flex';
+                    authCodeInput.focus();
+                    fetchAuthCodes(); // Fetch codes after splash screen animation
+                }, { once: true });
+            }, 2500);
+
+            // Add the event listeners that call the now-defined checkAuth function
+            submitAuthButton.addEventListener('click', checkAuth);
+            authCodeInput.addEventListener('keypress', (event) => {
+                if (event.key === "Enter") {
+                    event.preventDefault();
+                    if (!submitAuthButton.disabled) {
+                        checkAuth();
+                    }
+                }
+            });
+
+            requestAnimationFrame(() => {
+                document.body.style.opacity = '1';
+            });
+        });
+
+    } catch (error) {
+        console.error("❌ A critical error occurred during initialization:", error);
+        alert("A critical error occurred. The application cannot start.");
+        const mainContent = document.getElementById('mainContent');
+        if (mainContent) {
+            mainContent.innerHTML = "<p style='color:red; text-align:center;'>Application could not start due to a configuration error.</p>";
+            mainContent.classList.remove("blurred");
+        }
+    }
+</script>
+
+    <script>
+        function officeButtonClicked() {
+            alert("Offices section coming soon!");
+        }
+
+        document.addEventListener("DOMContentLoaded", function () {
+            requestAnimationFrame(() => {
+                document.body.style.opacity = '1';
+            });
+        });
+    </script>
+    <script>
+    if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () => {
+        navigator.serviceWorker.register('/sw.js')
+            .then((registration) => {
+            console.log('Service Worker registered with scope:', registration.scope);
+            })
+            .catch((error) => {
+            console.error('Service Worker registration failed:', error);
+            });
+        });
+    }
+</script>
+</body>
+</html>
