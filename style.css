@@ -2609,11 +2609,28 @@ main#mainContent.main-content-admin-active {
 }
 
  body.auth-wall-active header,
-        body.auth-wall-active main,
-        body.auth-wall-active .main-controls {
-            display: none !important;
-        }
+body.auth-wall-active main,
+body.auth-wall-active .main-controls {
+    display: none !important;
+}
 
-        body.auth-wall-active #authModal {
-            display: flex !important;
-        }
+body.auth-wall-active #authModal {
+    display: flex !important;
+}
+
+/* Separator line style */
+.separator-line {
+    width: 80%; /* Adjust width as needed */
+    max-width: 600px; /* Max width to match button group visual */
+    height: 2px; /* Thickness of the line */
+    background: linear-gradient(to right, transparent, #016751, transparent); /* Gradient from transparent to theme color and back */
+    margin: 30px 0; /* Space above and below the line */
+}
+
+/* Responsive adjustment for the separator line */
+@media (max-width: 768px) {
+    .separator-line {
+        width: 90%; /* Make it slightly wider on smaller screens */
+        margin: 20px 0; /* Reduce margin on smaller screens */
+    }
+}
