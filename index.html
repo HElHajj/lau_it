@@ -126,6 +126,7 @@
 
         /**
          * Checks the entered code against the fetched auth codes and grants access.
+         * AMENDED: Now redirects to the specific classroom page if parameters are present.
          */
         function checkAuth() {
             const enteredCode = authCodeInput.value.trim();
@@ -147,6 +148,42 @@
                 authModal.style.display = 'none';
                 mainContent.classList.remove("blurred");
                 errorMessage.style.display = 'none';
+
+                // --- NEW REDIRECTION LOGIC ---
+                const urlParams = new URLSearchParams(window.location.search);
+                const buildingParam = urlParams.get('building');
+                const levelParam = urlParams.get('level');
+                const roomParam = urlParams.get('room');
+                const modeParam = urlParams.get('mode');
+                const fromBatchParam = urlParams.get('fromBatch');
+
+                // Check if we have classroom-specific parameters from the batch file
+                if (buildingParam && levelParam && roomParam && modeParam === 'single' && fromBatchParam === 'true') {
+                    let classroomPage = '';
+                    // Determine the correct classroom HTML file based on the building
+                    const beirutBuildings = ["AKSOB", "Fine Arts", "Gezairi", "Nicol Hall", "Sage Hall", "WKSC"];
+                    const byblosBuildings = ["Block A", "Library", "Science", "Architecture", "Engineering", "Frem", "CHSC", "ELRC"];
+
+                    if (beirutBuildings.includes(buildingParam)) {
+                        classroomPage = 'beirut_classrooms.html';
+                    } else if (byblosBuildings.includes(buildingParam)) {
+                        classroomPage = 'byblos_classrooms.html';
+                    }
+
+                    if (classroomPage) {
+                        // Reconstruct the URL with all parameters for the classroom page
+                        const redirectUrl = `${classroomPage}?${urlParams.toString()}`;
+                        console.log(`Redirecting to specific classroom: ${redirectUrl}`);
+                        window.location.href = redirectUrl;
+                        return; // Stop further execution
+                    } else {
+                        console.warn(`Building '${buildingParam}' not recognized for specific classroom redirect. Proceeding to campus selection.`);
+                    }
+                }
+                
+                // If no specific classroom parameters or building not recognized, proceed to campus selection page
+                console.log("No specific classroom parameters found or building unrecognized. Showing campus selection.");
+                // The modal is already hidden, main content already unblurred, just let the user interact with buttons
             } else {
                 // On failed authentication
                 console.warn("Authentication failed: Incorrect code entered.");
@@ -159,7 +196,7 @@
         // --- 5. ADD EVENT LISTENERS AND RUN ON PAGE LOAD ---
         document.addEventListener("DOMContentLoaded", () => {
             const splashScreen = document.getElementById('splashScreen');
-
+            
             mainContent.classList.add("blurred");
             sessionStorage.removeItem('userRole'); // Clear any previous role
 
@@ -167,15 +204,42 @@
             authCodeInput.disabled = true;
             submitAuthButton.disabled = true;
 
+            // Immediately check for role in sessionStorage. If found, and relevant URL params exist,
+            // directly redirect to avoid showing index.html at all, improving user experience.
+            const userRoleInSession = sessionStorage.getItem('userRole');
+            const urlParamsOnLoad = new URLSearchParams(window.location.search);
+            const buildingParamOnLoad = urlParamsOnLoad.get('building');
+            const modeParamOnLoad = urlParamsOnLoad.get('mode');
+
+            if (userRoleInSession && buildingParamOnLoad && modeParamOnLoad === 'single') {
+                 let directClassroomPage = '';
+                 const beirutBuildings = ["AKSOB", "Fine Arts", "Gezairi", "Nicol Hall", "Sage Hall", "WKSC"];
+                 const byblosBuildings = ["Block A", "Library", "Science", "Architecture", "Engineering", "Frem", "CHSC", "ELRC"];
+
+                 if (beirutBuildings.includes(buildingParamOnLoad)) {
+                     directClassroomPage = 'beirut_classrooms.html';
+                 } else if (byblosBuildings.includes(buildingParamOnLoad)) {
+                     directClassroomPage = 'byblos_classrooms.html';
+                 }
+
+                 if (directClassroomPage) {
+                     console.log("User already authenticated and specific classroom URL found. Directing without splash/auth modal.");
+                     window.location.href = `${directClassroomPage}?${urlParamsOnLoad.toString()}`;
+                     return; // Crucial: Stop execution here to prevent showing splash/auth
+                 }
+            }
+
+
+            // Normal flow: Show splash, then auth modal, then fetch codes
             setTimeout(() => {
                 splashScreen.classList.add('hidden');
                 splashScreen.addEventListener('transitionend', () => {
                     splashScreen.style.display = 'none';
-                    authModal.style.display = 'flex';
+                    authModal.style.display = 'flex'; // Show auth modal
                     authCodeInput.focus();
                     fetchAuthCodes(); // Fetch codes after splash screen animation
                 }, { once: true });
-            }, 2500);
+            }, 2500); // Duration of splash screen display
 
             // Add the event listeners that call the now-defined checkAuth function
             submitAuthButton.addEventListener('click', checkAuth);
