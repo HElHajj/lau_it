@@ -42,10 +42,17 @@ html, body {
 
 /* The logo image on the splash screen */
 #splashLogo {
-    width: 280px; /* Adjust size as needed for a prominent logo */
+    width: 260px; /* Adjust size as needed for a prominent logo */
     height: auto;
     /* Apply the wave animation */
     animation: wave-in 1.5s ease-in-out forwards;
+}
+
+/* Media query for larger screens */
+@media (min-width: 1024px) { /* Adjust breakpoint as needed for "large screen" */
+    #splashLogo {
+        width: 500px; /* Bigger size for large screens */
+    }
 }
 
 /* Keyframes for the "wave-in" animation */
@@ -1308,6 +1315,17 @@ body.selection-page-body header {
     margin-bottom: 30px;
 }
 
+/* Make the contact us bigger */
+.intro-text h3 {
+    font-size: 2rem; /* Increased font size for "Contact Us" */
+    margin-bottom: 10px;
+}
+
+.intro-text p {
+    font-size: 1.2rem; /* Increased font size for contact details */
+    line-height: 1.6;
+}
+
 /* Container for the selection buttons */
 .button-group {
     display: flex;
@@ -1476,7 +1494,17 @@ body.selection-page-body header {
       min-width: unset;   /* Remove min-width as width is percentage-based */
       box-sizing: border-box; /* Ensures padding doesn't make it wider than 95% */
   }
+
+  .intro-text h3 {
+      font-size: 1.5rem; /* Smaller font size for "Contact Us" on tablets */
+  }
+
+  .intro-text p {
+      font-size: 1rem; /* Smaller font size for contact details on tablets */
+  }
 }
+
+ 
 
 /* Small screens (Mobile phones) */
 @media (max-width: 480px) {
@@ -1585,6 +1613,15 @@ body.selection-page-body header {
       max-width: 400px;  /* Good practice to have a max-width */
       min-width: unset;   /* Remove min-width as width is percentage-based */
       box-sizing: border-box; /* Ensures padding doesn't make it wider than 95% */
+  }
+  
+  /* Contact Us section for mobile view - even smaller */
+  .intro-text h3 {
+      font-size: 1.3rem; /* Even smaller font size for "Contact Us" on mobile phones */
+  }
+
+  .intro-text p {
+      font-size: 0.9rem; /* Even smaller font size for contact details on mobile phones */
   }
 }
 
