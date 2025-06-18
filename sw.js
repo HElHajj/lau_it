@@ -1,4 +1,37 @@
-// sw.js
+// Import the Firebase Cloud Messaging library scripts
+importScripts('https://www.gstatic.com/firebasejs/11.4.0/firebase-app-compat.js');
+importScripts('https://www.gstatic.com/firebasejs/11.4.0/firebase-messaging-compat.js');
+
+// Required for Firebase initialization within the Service Worker context
+// IMPORTANT: Ensure this firebaseConfig matches your project's config from config.js
+const firebaseConfig = {
+  apiKey: "AIzaSyAeqcHJNI4gEg4pf6tnhAmCVjdzsYJySuA", // Your API Key
+  authDomain: "lau-support-system.firebaseapp.com",
+  databaseURL: "https://lau-support-system-default-rtdb.europe-west1.firebasedatabase.app/",
+  projectId: "lau-support-system",
+  storageBucket: "lau-support-system.firebasestorage.app",
+  messagingSenderId: "751385390833", // THIS IS CRUCIAL FOR FCM
+  appId: "1:751385390833:web:d4642d34cd050347788350",
+  measurementId: "G-NDD6MDHXSQ"
+};
+
+// Initialize Firebase App
+firebase.initializeApp(firebaseConfig);
+
+// Retrieve Firebase Messaging object.
+const messaging = firebase.messaging();
+
+// Handle background messages
+messaging.onBackgroundMessage((payload) => {
+    console.log('Received background message:', payload);
+    const notificationTitle = payload.notification.title;
+    const notificationOptions = {
+        body: payload.notification.body,
+        icon: payload.notification.icon || '/pics/lau_icon.png' // Use your app icon
+    };
+
+    self.registration.showNotification(notificationTitle, notificationOptions);
+});
 
 const CACHE_NAME = 'lau-support-cache-v1';
 const urlsToCache = [

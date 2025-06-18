@@ -2765,5 +2765,96 @@
         });
     }
     </script>
+    <script type="module">
+        import { getMessaging, getToken, onMessage } from "https://www.gstatic.com/firebasejs/11.4.0/firebase-messaging.js";
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.4.0/firebase-app.js";
+        import { getDatabase, ref, set } from "https://www.gstatic.com/firebasejs/11.4.0/firebase-database.js";
+        import { firebaseConfig as importedFirebaseConfig } from './config.js'; // Ensure this path is correct
+
+        // Ensure Firebase Config is Loaded
+        window.ENV = window.ENV || {};
+        if (!window.ENV.FIREBASE_CONFIG) {
+            window.ENV.FIREBASE_CONFIG = importedFirebaseConfig;
+        }
+
+        // Check if the configuration is now available
+        if (!window.ENV || !window.ENV.FIREBASE_CONFIG) {
+            console.error("❌ Firebase configuration is missing. Cannot initialize messaging.");
+        } else {
+            const app = initializeApp(window.ENV.FIREBASE_CONFIG);
+            const messaging = getMessaging(app);
+            const database = getDatabase(app);
+
+            const userRole = sessionStorage.getItem('userRole');
+
+            // Function to save the FCM token to Firebase Realtime Database
+            async function saveMessagingToken(token) {
+                if (!userRole || (userRole !== 'admin' && userRole !== 'support')) {
+                    console.log("Not an admin or support user, skipping token saving.");
+                    return;
+                }
+
+                const tokenPath = `notificationTokens/${userRole}/` + token.replace(/\./g, '_'); // Replace . to avoid issues in Firebase paths
+                try {
+                    await set(ref(database, tokenPath), true); // Store token as a key with a boolean value
+                    console.log(`✅ FCM token saved for ${userRole}: ${token}`);
+                } catch (error) {
+                    console.error("❌ Error saving FCM token:", error);
+                }
+            }
+
+            // Request notification permission and get token
+            function requestPermissionAndGetToken() {
+                if (!("Notification" in window)) {
+                    console.warn("This browser does not support desktop notification.");
+                    return;
+                }
+
+                if (userRole === 'admin' || userRole === 'support') {
+                    Notification.requestPermission().then((permission) => {
+                        if (permission === 'granted') {
+                            console.log('Notification permission granted.');
+                            // IMPORTANT: Replace 'YOUR_VAPID_KEY_HERE' with your actual VAPID key
+                            getToken(messaging, { vapidKey: 'BOD99XqIbdfLXNIfPvONwKBa6YRHH4YVRbswAvj8PMVqJRuCVW3RD3XdpPJ4YLyN0DGxSuiuvZuTyvOa5inK76o' }) 
+                                .then((currentToken) => {
+                                    if (currentToken) {
+                                        console.log('FCM registration token:', currentToken);
+                                        saveMessagingToken(currentToken);
+                                    } else {
+                                        console.warn('No FCM registration token available. Request permission to generate one.');
+                                    }
+                                })
+                                .catch((err) => {
+                                    console.error('An error occurred while retrieving token. ', err);
+                                });
+                        } else {
+                            console.warn('Notification permission denied.');
+                        }
+                    }).catch(error => {
+                        console.error("Error requesting notification permission:", error);
+                    });
+                } else {
+                    console.log("User is not admin or support, not requesting notification permission.");
+                }
+            }
+
+            // Handle foreground messages (optional, if you want in-app notifications)
+            onMessage(messaging, (payload) => {
+                console.log('Foreground message received:', payload);
+                // Customize how to display the notification when app is in foreground
+                const notificationTitle = payload.notification.title;
+                const notificationOptions = {
+                    body: payload.notification.body,
+                    icon: payload.notification.icon || '/pics/lau_icon.png', // Use your app icon
+                };
+                new Notification(notificationTitle, notificationOptions);
+            });
+
+            // Request permission and get token on page load for admin/support roles
+            document.addEventListener('DOMContentLoaded', () => {
+                requestPermissionAndGetToken();
+            });
+        }
+    </script>
 </body>
 </html>
