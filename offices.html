@@ -284,6 +284,7 @@
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.4.0/firebase-app.js";
         import { getAnalytics } from "https://www.gstatic.com/firebasejs/11.4.0/firebase-analytics.js";
         import { getDatabase, ref, set, onValue, push, serverTimestamp, get, update, remove, query, orderByChild, startAt, endAt } from "https://www.gstatic.com/firebasejs/11.4.0/firebase-database.js";
+        import { getMessaging, getToken } from "https://www.gstatic.com/firebasejs/11.4.0/firebase-messaging.js";
         import { firebaseConfig } from './config.js'; 
 
         // --- Global Variables & Firebase Initialization ---
@@ -306,7 +307,49 @@
             console.error("❌ Firebase initialization failed:", error);
             alert("A critical error occurred during application initialization. Please check the console.");
         }
+        let messaging;
+const VAPID_KEY = "BOD99XqIbdfLXNIfPvONwKBa6YRHH4YVRbswAvj8PMVqJRuCVW3RD3XdpPJ4YLyN0DGxSuiuvZuTyvOa5inK76o"; // IMPORTANT: Replace with your actual VAPID key from Firebase Console
 
+// Function to request notification permission and get token
+async function requestNotificationPermissionAndGetToken(userRole) {
+    if (!('Notification' in window) || !('serviceWorker' in navigator) || !VAPID_KEY) {
+        console.warn('Notifications not supported or VAPID key missing.');
+        return;
+    }
+    try {
+        const permission = await Notification.requestPermission();
+        if (permission === 'granted') {
+            console.log('Notification permission granted.');
+            messaging = getMessaging(app); // Ensure 'app' is accessible (initialized Firebase app)
+            const currentToken = await getToken(messaging, { vapidKey: VAPID_KEY });
+            if (currentToken) {
+                console.log('FCM registration token:', currentToken);
+                await saveMessagingTokenToDatabase(currentToken, userRole);
+            } else {
+                console.log('No FCM registration token available. Request permission to generate one.');
+            }
+        } else {
+            console.warn('Notification permission denied or dismissed.');
+        }
+    } catch (error) {
+        console.error('Error getting FCM token:', error);
+    }
+}
+
+// Function to save the token to Firebase Realtime Database
+async function saveMessagingTokenToDatabase(token, userRole) {
+    const fcmTokensRef = ref(database, `fcmTokens/<span class="math-inline">\{userRole\}/</span>{token}`);
+    try {
+        await set(fcmTokensRef, {
+            token: token,
+            timestamp: serverTimestamp(),
+            lastAccessedRole: userRole,
+        });
+        console.log(`FCM token saved for role: ${userRole}`);
+    } catch (error) {
+        console.error('Error saving FCM token to database:', error);
+    }
+}
         // --- DOMContentLoaded: Main Entry Point ---
         document.addEventListener("DOMContentLoaded", function () {
             requestAnimationFrame(() => {
@@ -359,6 +402,10 @@
                      alert("Unknown role. Redirecting to login.");
                      window.location.href = 'index.html';
             }
+
+            if (currentUserRole) {
+        requestNotificationPermissionAndGetToken(currentUserRole);
+    }
         });
 
         // --- Centralized Activity Logging Function ---
@@ -452,7 +499,19 @@
                         issueCategory: issueData.officeIssueCategory,
                         details: `New issue reported by ${issueData.userName} in ${issueData.officeBuilding}.`
                     });
-
+                    // --- NEW: Trigger notification for Admins/Support ---
+                    const notificationTriggerRef = ref(database, `notificationTriggers/newOfficeIssue`);
+                    await push(notificationTriggerRef, {
+                        issueId: newIssueRef.key,
+                        building: issueData.officeBuilding,
+                        room: issueData.officeRoom,
+                        category: issueData.officeIssueCategory,
+                        reportedBy: issueData.userName,
+                        timestamp: serverTimestamp(),
+                        targetRoles: ['admin', 'support']
+                    });
+                    console.log("🔔 Notification trigger sent for new office issue.");
+                    // --- END NEW ---
                     await showGenericAlert("Issue submitted successfully", "", { autoClose: true, duration: 2500, showOkButton: false });
                     
                     form.reset();
@@ -612,6 +671,23 @@
                     logDetails.completionNote = completionNote;
                 }
                 await logOfficeActivity(issueId, 'Status Updated', logDetails);
+
+                // --- NEW: Trigger notification for End-User (Issue Status Update) ---
+                // You'll need the reporter's FCM token or a way to look it up.
+                // For now, we'll signal the backend about this event.
+                if (newStatus === 'Pending' || newStatus === 'Completed') {
+                    const notificationTriggerRef = ref(database, `notificationTriggers/officeIssueStatusUpdate`);
+                    await push(notificationTriggerRef, {
+                        issueId: issueId,
+                        status: newStatus,
+                        reportedBy: originalIssueData?.userName, // Assuming username is stored with the issue
+                        category: originalIssueData?.officeIssueCategory,
+                        timestamp: serverTimestamp(),
+                        // targetUserToken: originalIssueData?.reporterFcmToken // If you stored it
+                    });
+                    console.log(`🔔 Notification trigger sent for office issue status update to ${newStatus}.`);
+                }
+                // --- END NEW ---
 
             } catch(error) {
                 console.error("Failed to update issue status:", error);

@@ -52,6 +52,7 @@
     import { initializeApp } from "https://www.gstatic.com/firebasejs/11.4.0/firebase-app.js";
     import { getAnalytics } from "https://www.gstatic.com/firebasejs/11.4.0/firebase-analytics.js";
     import { getDatabase, ref, get } from "https://www.gstatic.com/firebasejs/11.4.0/firebase-database.js";
+    import { getMessaging, getToken } from "https://www.gstatic.com/firebasejs/11.4.0/firebase-messaging.js";
     import { firebaseConfig } from './config.js';
 
     try {
@@ -266,6 +267,91 @@
             mainContent.classList.remove("blurred");
         }
     }
+
+    // --- FCM Related Functions ---
+let messaging;
+const VAPID_KEY = "YOUR_VAPID_KEY_HERE"; // IMPORTANT: Replace with your actual VAPID key from Firebase Console
+
+// Function to request notification permission and get token
+async function requestNotificationPermissionAndGetToken(userRole) {
+    if (!('Notification' in window) || !('serviceWorker' in navigator) || !VAPID_KEY) {
+        console.warn('Notifications not supported or VAPID key missing.');
+        return;
+    }
+
+    try {
+        const permission = await Notification.requestPermission();
+        if (permission === 'granted') {
+            console.log('Notification permission granted.');
+            messaging = getMessaging(app); // Initialize messaging with your Firebase app
+            const currentToken = await getToken(messaging, { vapidKey: VAPID_KEY });
+            if (currentToken) {
+                console.log('FCM registration token:', currentToken);
+                // Send this token to your Firebase Realtime Database
+                // Associate it with the current user's role and a unique identifier (e.g., userId or a generated UUID)
+                await saveMessagingTokenToDatabase(currentToken, userRole);
+            } else {
+                console.log('No FCM registration token available. Request permission to generate one.');
+            }
+        } else {
+            console.warn('Notification permission denied or dismissed.');
+        }
+    } catch (error) {
+        console.error('Error getting FCM token:', error);
+    }
+}
+
+// Function to save the token to Firebase Realtime Database
+async function saveMessagingTokenToDatabase(token, userRole) {
+    // You should structure this path based on your Firebase database rules.
+    // For example: /fcmTokens/<userRole>/<token>
+    // Or if you have user authentication, /users/<userId>/fcmTokens/<token>
+    // For this example, let's assume a simplified structure where we overwrite for each user role
+    const fcmTokensRef = ref(database, `fcmTokens/${userRole}/${token}`);
+    try {
+        await set(fcmTokensRef, {
+            token: token,
+            timestamp: serverTimestamp(),
+            lastAccessedRole: userRole,
+            // You might want to add more user-specific data here, like a user ID from your auth system
+        });
+        console.log(`FCM token saved for role: ${userRole}`);
+    } catch (error) {
+        console.error('Error saving FCM token to database:', error);
+    }
+}
+
+// --- Modify checkAuth function to request notification permission after successful login ---
+function checkAuth() {
+    const enteredCode = authCodeInput.value.trim();
+    let userRole = null;
+
+    // Determine user role based on the entered code
+    if (enteredCode === authCodes.admin) {
+        userRole = 'admin';
+    } else if (enteredCode === authCodes.support) {
+        userRole = 'support';
+    } else if (enteredCode === authCodes.user) {
+        userRole = 'user';
+    }
+
+    if (userRole) {
+        console.log(`Authentication successful. Role assigned: ${userRole}`);
+        sessionStorage.setItem('userRole', userRole);
+        authModal.style.display = 'none';
+        mainContent.classList.remove("blurred");
+        errorMessage.style.display = 'none';
+
+        // Request notification permission and get token AFTER successful login
+        requestNotificationPermissionAndGetToken(userRole);
+
+    } else {
+        console.warn("Authentication failed: Incorrect code entered.");
+        errorMessage.style.display = 'block';
+        authCodeInput.value = '';
+        authCodeInput.focus();
+    }
+}
 </script>
 
     <script>

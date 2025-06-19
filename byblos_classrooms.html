@@ -747,6 +747,7 @@
         import { getAnalytics } from "https://www.gstatic.com/firebasejs/11.4.0/firebase-analytics.js";
         import { getDatabase, ref, set, onValue, push, update, get, remove, serverTimestamp } from "https://www.gstatic.com/firebasejs/11.4.0/firebase-database.js";
         import { firebaseConfig as importedFirebaseConfig } from './config.js';
+         import { getMessaging, getToken } from "https://www.gstatic.com/firebasejs/11.4.0/firebase-messaging.js";
 
         // Ensure Firebase Config is Loaded
         window.ENV = window.ENV || {};
@@ -1256,6 +1257,59 @@
 
         window.toggleColor = toggleColor; 
 
+let messaging;
+const VAPID_KEY = "BOD99XqIbdfLXNIfPvONwKBa6YRHH4YVRbswAvj8PMVqJRuCVW3RD3XdpPJ4YLyN0DGxSuiuvZuTyvOa5inK76o"; // IMPORTANT: Replace with your actual VAPID key from Firebase Console
+
+// Function to request notification permission and get token (re-used for consistency)
+async function requestNotificationPermissionAndGetToken(userRole) {
+    if (!('Notification' in window) || !('serviceWorker' in navigator) || !VAPID_KEY) {
+        console.warn('Notifications not supported or VAPID key missing.');
+        return;
+    }
+    try {
+        const permission = await Notification.requestPermission();
+        if (permission === 'granted') {
+            console.log('Notification permission granted.');
+            messaging = getMessaging(app); // Ensure 'app' is accessible (initialized Firebase app)
+            const currentToken = await getToken(messaging, { vapidKey: VAPID_KEY });
+            if (currentToken) {
+                console.log('FCM registration token:', currentToken);
+                await saveMessagingTokenToDatabase(currentToken, userRole);
+            } else {
+                console.log('No FCM registration token available. Request permission to generate one.');
+            }
+        } else {
+            console.warn('Notification permission denied or dismissed.');
+        }
+    } catch (error) {
+        console.error('Error getting FCM token:', error);
+    }
+}
+
+// Function to save the token to Firebase Realtime Database
+async function saveMessagingTokenToDatabase(token, userRole) {
+    const fcmTokensRef = ref(database, `fcmTokens/<span class="math-inline">\{userRole\}/</span>{token}`);
+    try {
+        await set(fcmTokensRef, {
+            token: token,
+            timestamp: serverTimestamp(),
+            lastAccessedRole: userRole,
+        });
+        console.log(`FCM token saved for role: ${userRole}`);
+    } catch (error) {
+        console.error('Error saving FCM token to database:', error);
+    }
+}
+
+// Call this after the user role is confirmed (e.g., in DOMContentLoaded or after a successful login check)
+document.addEventListener("DOMContentLoaded", function () {
+    const userRole = sessionStorage.getItem('userRole');
+    if (userRole) {
+        requestNotificationPermissionAndGetToken(userRole);
+    }
+
+});
+
     </script>
 
     <script type="module"> 
@@ -1412,6 +1466,21 @@
                 try {
                     await set(newIssueRef, issueData);
                     console.log(`✅ Issue saved to '${issuesPath}' node with key: ${newIssueRef.key}`);
+                    // --- NEW: Trigger notification for Admins/Support ---
+                    // This data will be picked up by a Firebase Cloud Function
+                    // to send push notifications to registered admin/support devices.
+                    const notificationTriggerRef = ref(database, `notificationTriggers/newClassroomIssue`);
+                    await push(notificationTriggerRef, {
+                        issueId: newIssueRef.key,
+                        building: buildingName,
+                        classroom: classroomName,
+                        summary: allIssues.join(", "),
+                        timestamp: serverTimestamp(),
+                        // Add specific roles to notify if needed for more granular control
+                        targetRoles: ['admin', 'support']
+                    });
+                    console.log("🔔 Notification trigger sent for new classroom issue.");
+                    // --- END NEW ---
                 } catch (error) {
                      console.error(`❌ Error saving issue to '${issuesPath}' node:`, error);
                      alert("Error saving issue details. The activity was logged, but details might be missing.");
@@ -1639,6 +1708,27 @@
                         currentHandledClassroomElement = null; 
                         console.log("Handle issue process complete.");
                     }, 2000); 
+
+                    // --- NEW: Trigger notification for End-User (Issue Handled) ---
+                    // This assumes you store some identifier for the reporting user
+                    // alongside the issue (e.g., their FCM token, or a user ID to look up their token).
+                    // For now, we'll signal the backend about this event.
+                    const originalIssueSnapshot = await get(ref(database, `${campusPrefix}/issues/${activeLogId}`)); // Fetch original issue data to get reporter details
+                    const originalIssueData = originalIssueSnapshot.val();
+
+                    const notificationTriggerRef = ref(database, `notificationTriggers/issueHandled`);
+                    await push(notificationTriggerRef, {
+                        issueId: activeLogId,
+                        building: buildingName,
+                        classroom: classroomName,
+                        status: "handled",
+                        reportedBy: originalIssueData?.username || 'unknown', // Assuming username is stored
+                        timestamp: serverTimestamp(),
+                        // If you have the user's FCM token, you'd include it here or a userId to look it up
+                        // targetUserToken: originalIssueData?.reporterFcmToken // If you stored it
+                    });
+                    console.log("🔔 Notification trigger sent for handled classroom issue.");
+                    // --- END NEW ---
 
                 } catch (error) {
                     console.error("❌ Error updating classroom state to yellow:", error);

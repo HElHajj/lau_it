@@ -47,7 +47,9 @@ const urlsToCache = [
   // Add other assets like fonts or important images if any
   'https://www.gstatic.com/firebasejs/11.4.0/firebase-app.js',
   'https://www.gstatic.com/firebasejs/11.4.0/firebase-analytics.js',
-  'https://www.gstatic.com/firebasejs/11.4.0/firebase-database.js'
+  'https://www.gstatic.com/firebasejs/11.4.0/firebase-database.js',
+  // Add firebase-messaging.js to cache for offline support
+  'https://www.gstatic.com/firebasejs/11.4.0/firebase-messaging.js'
 ];
 
 // Install event: open cache and add core files
@@ -183,4 +185,55 @@ self.addEventListener('fetch', (event) => {
         });
       })
   );
+});
+
+
+// === FCM Push Notification Handling ===
+
+// Listen for push events from Firebase Cloud Messaging
+self.addEventListener('push', (event) => {
+    console.log('[Service Worker] Push Received.', event.data.json());
+
+    // Extract data from the push message
+    const notificationData = event.data.json();
+    const title = notificationData.notification.title || 'LAU Support System';
+    const options = {
+        body: notificationData.notification.body || 'You have a new update.',
+        icon: notificationData.notification.icon || '/pics/lau_icon.png', // Fallback icon
+        badge: notificationData.notification.badge || '/pics/lau_icon.png', // Badge icon (for Android)
+        data: notificationData.data || {}, // Custom data passed in the push message
+        vibrate: [200, 100, 200], // Vibrate pattern
+        // Add more options as needed: image, actions, etc.
+        // https://developer.mozilla.org/en-US/docs/Web/API/ServiceWorkerRegistration/showNotification
+    };
+
+    // Show the notification
+    event.waitUntil(self.registration.showNotification(title, options));
+});
+
+// Listen for notification clicks
+self.addEventListener('notificationclick', (event) => {
+    console.log('[Service Worker] Notification click Received.');
+    event.notification.close(); // Close the notification after click
+
+    // Check if the notification has a URL to open
+    const targetUrl = event.notification.data?.url || '/index.html'; // Default to index page
+
+    // This looks for any open windows and focuses one if it matches the origin,
+    // otherwise opens a new one.
+    event.waitUntil(
+        clients.matchAll({ type: 'window', includeUncontrolled: true }).then((clientList) => {
+            for (let i = 0; i < clientList.length; i++) {
+                const client = clientList[i];
+                // Check if a client is already open at the target URL or any page under the same origin
+                if (client.url.startsWith(self.location.origin) && client.url.includes(targetUrl)) {
+                    return client.focus(); // Focus existing tab
+                }
+            }
+            // If no matching client found, open a new window
+            if (clients.openWindow) {
+                return clients.openWindow(targetUrl);
+            }
+        })
+    );
 });
