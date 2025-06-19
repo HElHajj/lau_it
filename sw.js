@@ -52,6 +52,8 @@ const urlsToCache = [
   'https://www.gstatic.com/firebasejs/11.4.0/firebase-messaging.js'
 ];
 
+
+
 // Install event: open cache and add core files
 self.addEventListener('install', (event) => {
   console.log('Service Worker: Installing...');
